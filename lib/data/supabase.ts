@@ -233,7 +233,7 @@ export const supabaseSource: DataSource = {
     // ต้องใช้ service role (ฝั่ง server เท่านั้น) เซ็น URL ชั่วคราว 1 ชม. — route เป็นคนตรวจ consent/สิทธิ์ก่อนเรียกมาถึงนี่
     const admin = createServiceSupabase();
     if (!admin) {
-      console.warn("[praksa] ไม่มี SUPABASE_SERVICE_ROLE_KEY — เสิร์ฟรูปไม่ได้");
+      console.warn("[ebw] ไม่มี SUPABASE_SERVICE_ROLE_KEY — เสิร์ฟรูปไม่ได้");
       return null;
     }
     const { data: files } = await admin.storage.from(PHOTO_BUCKET).list(photoId);

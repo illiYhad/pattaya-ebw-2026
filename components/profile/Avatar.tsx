@@ -1,6 +1,6 @@
 import React from "react";
 import { initialsOf } from "@/lib/people";
-import { KrasaMark } from "@/components/brand/Brand";
+import { EventMark } from "@/components/brand/Brand";
 
 const SIZES = { sm: "h-8 w-8 text-xs", md: "h-24 w-20 text-xl", lg: "h-48 w-40 text-4xl", xl: "h-80 w-64 text-6xl", fill: "h-full w-full text-5xl" };
 
@@ -10,7 +10,7 @@ export function Avatar({ src, name, size = "md", className = "", mark }: { src?:
     <div className={`brand-bg relative flex shrink-0 items-end justify-center overflow-hidden rounded-lg ${SIZES[size]} ${className}`} aria-label={name}>
       {size !== "sm" && (
         <div className="pointer-events-none absolute -right-[10%] -top-[10%] opacity-10" aria-hidden>
-          <KrasaMark variant="white" size={size === "fill" || size === "xl" ? 260 : 120} />
+          <EventMark variant="white" size={size === "fill" || size === "xl" ? 260 : 120} />
         </div>
       )}
       {src ? (
@@ -27,7 +27,7 @@ export function Avatar({ src, name, size = "md", className = "", mark }: { src?:
       )}
       {mark && (
         <div className="absolute bottom-1 right-1 opacity-80" aria-hidden>
-          <KrasaMark variant="white" size={mark} />
+          <EventMark variant="white" size={mark} />
         </div>
       )}
     </div>

@@ -6,7 +6,7 @@ import type { AthletePhoto } from "@/lib/types";
 import { DEFAULT_CHROMA, chromaKey, fitCanvas, type ChromaOptions } from "@/lib/chroma";
 import { notifyDataChanged } from "@/lib/data/live";
 import { ConfirmButton, btn } from "@/components/ui/ConfirmButton";
-import { KrasaMark } from "@/components/brand/Brand";
+import { EventMark } from "@/components/brand/Brand";
 import { MsgLine, useAct } from "@/components/ui/useAct";
 import { deletePhotoAction, setPhotoConsentAction } from "@/app/admin/photos/actions";
 
@@ -74,7 +74,7 @@ export function PhotoStudioClient({ persons, photos }: { persons: PersonRow[]; p
     try {
       const img = await loadImage(file);
       setSource(fitCanvas(img, PREVIEW_MAX));
-      (window as unknown as { __praksaOriginal?: HTMLCanvasElement }).__praksaOriginal = fitCanvas(img, ORIGINAL_MAX);
+      (window as unknown as { __ebwOriginal?: HTMLCanvasElement }).__ebwOriginal = fitCanvas(img, ORIGINAL_MAX);
     } catch (e) {
       setSaveMsg({ ok: false, text: e instanceof Error ? e.message : "เปิดรูปไม่ได้" });
     }
@@ -82,7 +82,7 @@ export function PhotoStudioClient({ persons, photos }: { persons: PersonRow[]; p
 
   const save = async () => {
     if (!person || !cutoutRef.current) return;
-    const original = (window as unknown as { __praksaOriginal?: HTMLCanvasElement }).__praksaOriginal ?? source;
+    const original = (window as unknown as { __ebwOriginal?: HTMLCanvasElement }).__ebwOriginal ?? source;
     if (!original) return;
     setSaving(true);
     setSaveMsg(null);
@@ -188,7 +188,7 @@ export function PhotoStudioClient({ persons, photos }: { persons: PersonRow[]; p
                 <div>
                   <div className="mb-1 text-xs text-muted">ตัดพื้นแล้ว (พรีวิวบนพื้นสีงาน)</div>
                   <div className="relative aspect-[3/4] w-full overflow-hidden rounded" style={{ background: BRAND_BG }}>
-                    <div className="pointer-events-none absolute -right-[10%] -top-[8%] opacity-10" aria-hidden><KrasaMark variant="white" size={320} /></div>
+                    <div className="pointer-events-none absolute -right-[10%] -top-[8%] opacity-10" aria-hidden><EventMark variant="white" size={320} /></div>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     {preview && <img src={preview} alt="" className="relative h-full w-full object-contain object-bottom" />}
                   </div>

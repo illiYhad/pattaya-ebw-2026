@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { EVENT } from "@/lib/event";
-import { KrasaLogo, Seal } from "@/components/brand/Brand";
+import { EventLogo, Seal } from "@/components/brand/Brand";
 import { UserBadge } from "@/components/auth/UserBadge";
 
-/** หัวเว็บทุกหน้า (ยกเว้น overlay/print ที่ซ่อนด้วย CSS): KRASA ขาว สูง 40 (มือถือ 32) ซ้าย · ตรา 36 ขวา */
+/** หัวเว็บทุกหน้า (ยกเว้น overlay/print ที่ซ่อนด้วย CSS): โลโก้งานสีขาว สูง 40 (มือถือ 32) ซ้าย · ตรา 36 ขวา */
 export function SiteHeader({ logoSrc }: { logoSrc?: string }) {
   return (
     <header className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-white/10 bg-surface px-4 py-2">
       <Link href="/" className="flex items-center" aria-label={EVENT.shortTitle}>
-        <span className="hidden sm:block"><KrasaLogo variant="white" width={Math.round(40 / (390 / 560))} src={logoSrc} priority /></span>
-        <span className="sm:hidden"><KrasaLogo variant="white" width={Math.round(32 / (390 / 560))} src={logoSrc} priority /></span>
+        <span className="hidden sm:block"><EventLogo variant="white" width={Math.round(40 / (390 / 560))} src={logoSrc} priority /></span>
+        <span className="sm:hidden"><EventLogo variant="white" width={Math.round(32 / (390 / 560))} src={logoSrc} priority /></span>
       </Link>
       <nav className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
         <Link href="/bracket/rov">สาย</Link>

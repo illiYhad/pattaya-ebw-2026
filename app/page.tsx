@@ -2,7 +2,7 @@ import Link from "next/link";
 import { data } from "@/lib/data";
 import { EVENT } from "@/lib/event";
 import { medalTable } from "@/lib/medals";
-import { KrasaLogo, Seal, Watermark } from "@/components/brand/Brand";
+import { EventLogo, Seal, Watermark } from "@/components/brand/Brand";
 import { clockOf, dayKeyOf, nameOf, shortCategoryName, statusLabel, thaiDate } from "@/lib/view";
 
 // หน้าสาธารณะ: ไม่ subscribe Realtime — ใช้ revalidate แทน (โควตาการเชื่อมต่อ Supabase)
@@ -39,8 +39,8 @@ export default async function Home() {
       <section className="relative space-y-2 overflow-hidden rounded-xl bg-surface p-5">
         <Watermark height={420} opacity={0.05} />
         <div className="relative flex flex-wrap items-center gap-6">
-          <span className="hidden sm:block"><KrasaLogo variant="white" width={420} priority /></span>
-          <span className="sm:hidden"><KrasaLogo variant="white" width={260} priority /></span>
+          <span className="hidden sm:block"><EventLogo variant="white" width={420} priority /></span>
+          <span className="sm:hidden"><EventLogo variant="white" width={260} priority /></span>
           <span className="hidden sm:block"><Seal size={120} priority /></span>
           <span className="sm:hidden"><Seal size={80} priority /></span>
         </div>

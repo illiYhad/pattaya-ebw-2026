@@ -3,7 +3,7 @@ import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { getStaff, mockBlocked, BLOCKED_MESSAGE, ROLE_LABEL } from "@/lib/auth";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { signOutAction } from "@/app/login/actions";
-import { KrasaLogo, Seal } from "@/components/brand/Brand";
+import { EventLogo, Seal } from "@/components/brand/Brand";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "เข้าสู่ระบบสตาฟ" };
@@ -12,7 +12,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const q = await searchParams;
   const Brand = () => (
     <div className="flex flex-col items-center gap-3 py-2">
-      <KrasaLogo variant="white" width={280} priority />
+      <EventLogo variant="white" width={280} priority />
       <Seal size={72} />
     </div>
   );

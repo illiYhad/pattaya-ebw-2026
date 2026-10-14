@@ -37,7 +37,7 @@ export const DEFAULT_HOTKEYS: HotkeyMap = {
   clearHud: "Alt+C",
 };
 
-const LOCAL_KEY = "praksa-stream-hub-hotkeys";
+const LOCAL_KEY = "ebw-stream-hub-hotkeys";
 
 // แปลง KeyboardEvent เป็นข้อความเช่น "Alt+1" — ใช้ e.code เพื่อให้ทำงานได้แม้เปิดแป้นภาษาไทยอยู่
 export function comboFromEvent(e: KeyboardEvent): string | null {

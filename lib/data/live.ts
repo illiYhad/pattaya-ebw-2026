@@ -4,7 +4,7 @@ import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 
 // ฝั่งเบราว์เซอร์: แจ้ง "ข้อมูลเปลี่ยน ให้โหลดใหม่" (ไม่มีคำสั่งควบคุม จึงไม่ต้องใช้รหัสลับ)
-const NAME = "praksa-data";
+const NAME = "ebw-data";
 const TABLES = ["matches", "teams", "sponsors"] as const;
 
 /** mock: BroadcastChannel ในเครื่อง · Supabase: postgres_changes บน matches / teams / sponsors */

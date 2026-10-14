@@ -2,14 +2,14 @@
 
 import React, { useEffect, useRef } from "react";
 import type { Sponsor } from "@/lib/types";
-import { BRAND, KrasaLogo, KrasaMark, Seal } from "@/components/brand/Brand";
+import { BRAND, EventLogo, EventMark, Seal } from "@/components/brand/Brand";
 import { SponsorLogo } from "./SponsorLogo";
 
 export const STINGER_MS = 1400;
 const COVER_AT = 0.5; // สัดส่วนเวลาที่จอถูกปิดมิด (สลับฉากตรงนี้ = 700ms)
 
 /**
- * สติงเกอร์ KRASA GAMES 2026 (ใบ 1418 ข้อ 3.1): แผ่นน้ำเงินเอียงกวาดเข้า → เส้นคลื่นฟ้าวิ่งตาม → โลโก้บินเข้า → ตรา/สปอนเซอร์ → ปิดมิด (onCovered) → ค้าง → กวาดออก
+ * สติงเกอร์ EBW Championship 2026 (ใบ 1418 ข้อ 3.1): แผ่นน้ำเงินเอียงกวาดเข้า → เส้นคลื่นฟ้าวิ่งตาม → โลโก้บินเข้า → ตรา/สปอนเซอร์ → ปิดมิด (onCovered) → ค้าง → กวาดออก
  * playId เปลี่ยน = เล่น 1 รอบ · videoSrc (.webm) = ใช้วิดีโอแทนทั้งหมด · title ใช้เป็น aria-label เท่านั้น
  */
 export function Stinger({
@@ -108,7 +108,7 @@ export function Stinger({
           {/* แผ่นน้ำเงินเอียง + ลายน้ำนก */}
           <div ref={plateRef} className="absolute -inset-x-[20%] inset-y-0 overflow-hidden" style={{ background: "linear-gradient(120deg, var(--brand-navy) 0%, var(--brand-blue) 100%)", transform: "skewX(-12deg) translateX(-115%)" }}>
             <div className="absolute right-[18%] top-1/2 -translate-y-1/2" style={{ opacity: 0.06, transform: "skewX(12deg) translateY(-50%)" }}>
-              <KrasaMark variant="white" size={900} />
+              <EventMark variant="white" size={900} />
             </div>
           </div>
           {/* เส้นคลื่นฟ้า */}
@@ -116,7 +116,7 @@ export function Stinger({
           <div ref={line2Ref} className="absolute left-0 top-[56%] h-[6px] w-full" style={{ background: "linear-gradient(90deg, var(--accent), var(--brand-cyan))", opacity: 0 }} />
           {/* โลโก้ */}
           <div ref={logoRef} className="absolute left-1/2 top-[44%] -translate-x-1/2 -translate-y-1/2" style={{ opacity: 0 }}>
-            <KrasaLogo variant="white" width={920} priority />
+            <EventLogo variant="white" width={920} priority />
           </div>
           {/* ตรา + จัดโดย + สปอนเซอร์ */}
           <div ref={creditRef} className="absolute inset-x-0 bottom-0 top-[70%] flex flex-col items-center justify-between pb-10" style={{ opacity: 0 }}>

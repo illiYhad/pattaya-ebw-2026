@@ -6,10 +6,10 @@ Next.js (App Router) + TypeScript + Tailwind v4. ชั้นข้อมูล�
 ```
 npm install
 cp .env.example .env.local   # ว่างไว้ได้ ระบบ realtime จะ no-op
-npm run dev                  # http://localhost:3200
+npm run dev                  # http://localhost:3300
 npm run build
 ```
-พอร์ตใช้ **3200** (ห้ามใช้ 3000 · 3001 · 3100 · 3999 · 60)
+พอร์ตใช้ **3300** (ห้ามใช้ 3000 · 3001 · 3100 · 3200 · 3201 · 3999 · 60)
 
 ## หน้า
 `/` · `/bracket/[game]` · `/display/[game]` · `/admin` · `/admin/result` · `/checkin` · `/stream-hub` · `/overlay/[game]/[matchId]`

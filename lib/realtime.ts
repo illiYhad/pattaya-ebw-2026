@@ -2,7 +2,7 @@ import { createClient, type RealtimeChannel, type SupabaseClient } from "@supaba
 import type { Scene } from "@/lib/types";
 
 // ชื่อ channel มีรหัสลับต่องาน (CHANNEL_KEY ฝั่ง server) กันคนนอกเดาชื่อแล้วยิงเข้า channel
-export const matchChannelName = (key: string, matchId: string) => `praksa-${key}-match-${matchId}`;
+export const matchChannelName = (key: string, matchId: string) => `ebw-${key}-match-${matchId}`;
 
 export const EVENTS = {
   sceneChange: "scene_change",

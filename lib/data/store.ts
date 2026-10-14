@@ -116,15 +116,15 @@ export function buildFromRoster(roster: Roster): Store {
 }
 
 function build(): Store {
-  if (process.env.PRAKSA_SEED === "test") return buildTestStore();
+  if (process.env.EBW_SEED === "test") return buildTestStore();
   try {
     return buildFromRoster(parseRoster(fs.readFileSync(ROSTER_FILE, "utf8")));
   } catch {
-    console.warn(`[praksa] ไม่พบ ${ROSTER_FILE} — ใช้ seed ทดสอบแทน`);
+    console.warn(`[ebw] ไม่พบ ${ROSTER_FILE} — ใช้ seed ทดสอบแทน`);
     return buildTestStore();
   }
 }
 
 // เก็บไว้ที่ globalThis กันโมดูลถูกโหลดซ้ำแยกกันระหว่างหน้า/server action ตอน dev
-const g = globalThis as unknown as { __praksaMock?: Store };
-export const db: Store = (g.__praksaMock ??= build());
+const g = globalThis as unknown as { __ebwMock?: Store };
+export const db: Store = (g.__ebwMock ??= build());

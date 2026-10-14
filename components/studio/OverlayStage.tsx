@@ -7,7 +7,7 @@ import { EVENTS, matchChannelName, openBus, type BugCorner, type HubEventMap, ty
 import { athleteName, publicPhoto } from "@/lib/people";
 import { EVENT } from "@/lib/event";
 import { Avatar } from "@/components/profile/Avatar";
-import { BRAND, KrasaLogo, OfficialBug, OfficialHeader, Seal, Watermark } from "@/components/brand/Brand";
+import { BRAND, EventLogo, OfficialBug, OfficialHeader, Seal, Watermark } from "@/components/brand/Brand";
 import { SponsorLogo } from "./SponsorLogo";
 import { Stinger } from "./Stinger";
 
@@ -171,7 +171,7 @@ export function OverlayStage({ channelKey, game, match, categoryName, matches, t
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-8 overflow-hidden bg-bg/90">
           <Watermark height={820} />
           <OfficialHeader showLogo={false} />
-          <KrasaLogo variant="white" width={480} priority />
+          <EventLogo variant="white" width={480} priority />
           <div className="relative text-6xl font-black">เริ่มเร็ว ๆ นี้</div>
           <div className="relative flex items-end justify-center gap-10">
             <div className="flex max-w-[800px] flex-col items-center gap-3">{sidePhotos(a)}<div className="text-5xl font-bold">{aName}</div>{sideNames(a)}</div>
@@ -219,7 +219,7 @@ export function OverlayStage({ channelKey, game, match, categoryName, matches, t
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-8 overflow-hidden bg-bg/90">
           <Watermark height={820} />
           <OfficialHeader showLogo={false} />
-          <KrasaLogo variant="white" width={640} priority />
+          <EventLogo variant="white" width={640} priority />
           <div className="relative text-8xl font-black">พักการแข่งขัน</div>
           <div className="relative flex items-center gap-4 text-3xl text-muted">
             <Seal size={110} />
@@ -279,7 +279,7 @@ export function OverlayStage({ channelKey, game, match, categoryName, matches, t
           {fullScreenSponsors.length === 0 ? (
             // ไม่มีสปอนเซอร์ → โลโก้งาน + ตรา + ผู้จัด (ไม่เขียน "ขอบคุณผู้สนับสนุน")
             <>
-              <KrasaLogo variant="white" width={760} priority />
+              <EventLogo variant="white" width={760} priority />
               <div className="relative flex items-center gap-5 text-4xl">
                 <Seal size={120} />
                 <span>จัดโดย {BRAND.organizer}</span>
@@ -294,7 +294,7 @@ export function OverlayStage({ channelKey, game, match, categoryName, matches, t
                 </div>
               ))}
               <div className="absolute bottom-12 left-1/2 flex -translate-x-1/2 items-center gap-6">
-                <KrasaLogo variant="white" width={260} />
+                <EventLogo variant="white" width={260} />
                 <Seal size={96} />
               </div>
             </>

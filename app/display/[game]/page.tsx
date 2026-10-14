@@ -3,7 +3,7 @@ import { data } from "@/lib/data";
 import { LiveRefresh } from "@/components/studio/LiveRefresh";
 import { SponsorTicker } from "@/components/studio/SponsorTicker";
 import { nameOf, shortCategoryName, sponsorsAt } from "@/lib/view";
-import { KrasaLogo, Seal } from "@/components/brand/Brand";
+import { EventLogo, Seal } from "@/components/brand/Brand";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +33,7 @@ export default async function DisplayPage({ params }: { params: Promise<{ game: 
       <div className="flex min-h-screen flex-col gap-4 p-8" style={{ minHeight: 1080, width: "100%" }}>
         <div className="flex items-center justify-between gap-6">
           <div className="flex items-center gap-6">
-            <KrasaLogo variant="white" width={280} priority />
+            <EventLogo variant="white" width={280} priority />
             <h1 className="text-4xl font-black">
               <span className="text-accent">{g.name}</span> · บอร์ดสถานี
             </h1>

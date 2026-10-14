@@ -5,12 +5,12 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import "./globals.css";
 
-const description = `${EVENT.titleLine1} ${EVENT.titleLine2} · กีฬาอีสปอร์ต · จัดโดย ${EVENT.organizer}`;
+const description = `${EVENT.titleLine1} ${EVENT.titleLine2} · จัดโดย ${EVENT.organizer}`;
 
 export const metadata: Metadata = {
   title: { default: EVENT.shortTitle, template: `%s · ${EVENT.shortTitle}` },
   description,
-  // รูปแชร์ใช้ app/opengraph-image.png อัตโนมัติ (ระบบไฟล์ metadata ของ Next)
+  // รูปแชร์ใช้ app/opengraph-image.tsx อัตโนมัติ (ระบบไฟล์ metadata ของ Next)
   openGraph: { title: EVENT.shortTitle, description, siteName: EVENT.shortTitle, locale: "th_TH", type: "website" },
   twitter: { card: "summary_large_image", title: EVENT.shortTitle, description },
 };

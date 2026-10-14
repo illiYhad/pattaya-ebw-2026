@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
-/* ธีมสีตั้งต้นตามโลโก้ KRASA GAMES 2026 (ใบ 1418 ข้อ 2) — เปลี่ยนได้จากตั้งค่างาน */
+/* ธีมสีงาน EBW: น้ำเงินเข้มทะเล · เทอร์ควอยซ์ · โรสโกลด์ · ขาวมุก (จากโปสเตอร์) — เปลี่ยนได้จากตั้งค่างาน */
 :root {
-  --bg: #061537;
-  --surface: #0C2152;
-  --text: #EEF4FF;
-  --muted: #9DB2D6;
-  --accent: #5BC8F2;
-  --accent-2: #F2B33D; /* สีทองเหรียญ: vs / ผู้ชนะ / เหรียญ */
+  --bg: #06203A;
+  --surface: #0B3055;
+  --text: #F7F3EE;
+  --muted: #A9C1CC;
+  --accent: #2EC4B6;
+  --accent-2: #E0A890; /* โรสโกลด์: ไฮไลต์ / ผู้ชนะ / เหรียญ */
   --live: #EF4444;
-  --brand-navy: #0A2465;
-  --brand-blue: #0F55B8;
-  --brand-cyan: #9FE3FB;
+  --brand-navy: #0A3A5C;
+  --brand-blue: #137A8C;
+  --brand-cyan: #9CEDE4;
 }
 
 @theme inline {

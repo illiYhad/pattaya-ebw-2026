@@ -2,7 +2,7 @@ import type { Match, Sponsor } from "@/lib/types";
 import { emptyStore, type Store } from "./defaults";
 import { STATION_COUNT } from "@/lib/event";
 
-// seed ทดสอบ (ทีมทดสอบ A… · ผู้เล่นทดสอบ 01…) — ใช้เมื่อ PRAKSA_SEED=test หรือไม่มีไฟล์รายชื่อจริง
+// seed ทดสอบ (ทีมทดสอบ A… · ผู้เล่นทดสอบ 01…) — ใช้เมื่อ EBW_SEED=test หรือไม่มีไฟล์รายชื่อจริง
 const NOW = () => new Date().toISOString();
 
 export function buildTestStore(): Store {
