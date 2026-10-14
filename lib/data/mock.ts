@@ -54,5 +54,16 @@ export const mockSource: DataSource = {
     return kind === "original" ? { bytes: f.original, mime: f.originalMime } : { bytes: f.cutout, mime: "image/png" };
   },
 
+  async getScoreSheets(categoryId) { return engine().getScoreSheets(categoryId); },
+  async saveScoreSheet(entryId, judgeNo, input) { return engine().saveScoreSheet(entryId, judgeNo, input); },
+  async clearScoreSheet(entryId, judgeNo) { engine().clearScoreSheet(entryId, judgeNo); },
+  async setScoreMethod(categoryId, method) { return engine().setScoreMethod(categoryId, method); },
+  async setTieDecision(categoryId, orderedEntryIds) { return engine().setTieDecision(categoryId, orderedEntryIds); },
+  async getResultBoard(categoryId) { return engine().getResultBoard(categoryId); },
+  async getPublicResults(categoryId) { return engine().getPublicResults(categoryId); },
+  async publishResults(categoryId) { return engine().publishResults(categoryId); },
+  async hideResults(categoryId) { return engine().hideResults(categoryId); },
+  async getScoreAudit(categoryId) { return engine().getScoreAudit(categoryId); },
+
   subscribe: subscribeDataChanges,
 };
