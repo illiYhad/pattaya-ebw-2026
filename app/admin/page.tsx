@@ -1,54 +1,98 @@
 import Link from "next/link";
 import { data } from "@/lib/data";
 import { AdminNav } from "@/components/admin/AdminNav";
-import { formatLabel } from "@/lib/view";
+import { SESSION_LABEL, criteriaSummary, timeRangeOf } from "@/lib/view";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  const [games, categories, teams, matches, settings, sponsors] = await Promise.all([
-    data.getGames(),
+  const [categories, competitors, entries, sponsors] = await Promise.all([
     data.getCategories(),
-    data.getTeams(),
-    data.getMatches(),
-    data.getCategorySettings(),
+    data.getCompetitors(),
+    data.getEntries(),
     data.getSponsors(),
   ]);
+  const perPerson = new Map<string, number>();
+  for (const e of entries) perPerson.set(e.competitor_id, (perPerson.get(e.competitor_id) ?? 0) + 1);
+  const twoCats = [...perPerson.values()].filter((n) => n >= 2).length;
+  const pendingTotal = categories.reduce((a, c) => a + c.pending_notes.length, 0);
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <AdminNav />
       <h1 className="text-xl font-bold">ภาพรวม</h1>
-      {games.map((g) => {
-        const cats = categories.filter((c) => c.game_id === g.id);
-        return (
-          <section key={g.id}>
-            <h2 className="mb-1 font-bold text-accent-2">{g.name}</h2>
-            <ul className="space-y-1 text-sm">
-              {cats.map((c) => {
-                const n = teams.filter((t) => t.category_id === c.id).length;
-                const ms = matches.filter((m) => m.category_id === c.id);
-                const s = settings.find((x) => x.category_id === c.id);
+
+      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          ["ผู้แข่ง", competitors.length],
+          ["รายการที่ลง", entries.length],
+          ["ลง 2 ประเภท", twoCats],
+          ["เช็กอินแล้ว", entries.filter((e) => e.is_checked_in).length],
+        ].map(([l, v]) => (
+          <div key={l} className="rounded bg-surface p-3 text-center">
+            <div className="text-3xl font-black text-accent">{v}</div>
+            <div className="text-xs text-muted">{l}</div>
+          </div>
+        ))}
+      </section>
+
+      {pendingTotal > 0 && (
+        <p className="rounded bg-amber-500/15 p-3 text-sm text-amber-200">
+          ⏸ มี {pendingTotal} ข้อที่ยัง<b>รอครูหนึ่งยืนยัน</b> (ดูในแต่ละประเภท) — ค่าที่ตั้งไว้เป็นค่าตั้งต้นจากโปสเตอร์ ยังไม่ใช่ข้อสรุป
+        </p>
+      )}
+
+      <section>
+        <h2 className="mb-1 font-bold text-accent-2">ประเภทการแข่งขัน {categories.length} ประเภท</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] text-sm">
+            <thead className="text-xs text-muted">
+              <tr>
+                <th className="py-1 text-left">ประเภท</th>
+                <th className="text-left">ช่วง / เวลา</th>
+                <th className="text-center">ผู้แข่ง</th>
+                <th className="text-center">เช็กอิน</th>
+                <th className="text-left">เกณฑ์</th>
+                <th className="text-center">กรรมการ</th>
+                <th className="text-left">รอยืนยัน</th>
+              </tr>
+            </thead>
+            <tbody>
+              {categories.map((c) => {
+                const es = entries.filter((e) => e.category_id === c.id);
+                const sum = criteriaSummary(c);
                 return (
-                  <li key={c.id} className="flex flex-wrap items-center gap-2">
-                    <Link href={`/admin/categories/${c.id}`} className="text-accent">{c.name}</Link>
-                    <span className="text-muted">
-                      {n} ทีม · {s ? formatLabel[s.format] : "-"} · แมตช์ {ms.length}
-                      {ms.some((m) => m.status === "ongoing") && <span className="ml-1 text-live">● LIVE</span>}
-                    </span>
-                    {n === 1 && s?.single_entry === "pending" && <span className="rounded bg-amber-500/20 px-1 text-xs text-amber-300">ผู้สมัคร 1 คน</span>}
-                  </li>
+                  <tr key={c.id} className="border-t border-white/5 align-top">
+                    <td className="py-1 pr-2">
+                      <Link href={`/admin/categories#${c.code}`} className="text-accent">{c.name}</Link>
+                      <div className="text-xs text-muted">{c.name_en}</div>
+                    </td>
+                    <td className="pr-2 text-muted">{SESSION_LABEL[c.session]} · {timeRangeOf(c)}</td>
+                    <td className="text-center">{es.length}</td>
+                    <td className="text-center">{es.filter((e) => e.is_checked_in).length}</td>
+                    <td className="pr-2 text-muted">
+                      {c.criteria.length ? `${c.criteria.length} ข้อ · รวม ${sum.total}${sum.blank ? ` · ว่าง ${sum.blank} ข้อ` : ""}` : "ยังไม่มี"}
+                    </td>
+                    <td className="text-center">{c.judge_count}</td>
+                    <td>{c.pending_notes.length > 0 && <span className="rounded bg-amber-500/20 px-1 text-xs text-amber-300">⏸ {c.pending_notes.length} ข้อ</span>}</td>
+                  </tr>
                 );
               })}
-            </ul>
-          </section>
-        );
-      })}
-      <h2 className="font-bold text-accent-2">สปอนเซอร์</h2>
-      <ul className="text-sm">
-        {sponsors.map((s) => (
-          <li key={s.id}>{s.name} · {s.level} · {s.position} · ลำดับ {s.sequence}</li>
-        ))}
-      </ul>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="mb-1 font-bold text-accent-2">สปอนเซอร์</h2>
+        {sponsors.length === 0 ? (
+          <p className="text-sm text-muted">ยังไม่มี — เพิ่มได้ที่เมนูสปอนเซอร์</p>
+        ) : (
+          <ul className="text-sm">
+            {sponsors.map((s) => <li key={s.id}>{s.name} · {s.level} · {s.position} · ลำดับ {s.sequence}</li>)}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }

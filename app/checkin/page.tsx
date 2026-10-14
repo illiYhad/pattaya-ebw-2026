@@ -4,16 +4,11 @@ import { CheckinClient } from "@/components/studio/CheckinClient";
 export const dynamic = "force-dynamic";
 
 export default async function CheckinPage() {
-  const [games, categories, teams, players] = await Promise.all([
-    data.getGames(),
-    data.getCategories(),
-    data.getTeams(),
-    data.getPlayers(),
-  ]);
+  const [categories, competitors, entries] = await Promise.all([data.getCategories(), data.getCompetitors(), data.getEntries()]);
   return (
     <div className="space-y-3">
-      <h1 className="text-xl font-bold">เช็กอิน</h1>
-      <CheckinClient games={games} categories={categories} teams={teams} players={players} />
+      <h1 className="text-xl font-bold">เช็กอินผู้แข่ง</h1>
+      <CheckinClient categories={categories} competitors={competitors} entries={entries} />
     </div>
   );
 }

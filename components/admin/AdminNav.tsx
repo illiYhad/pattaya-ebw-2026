@@ -5,14 +5,11 @@ import { usePathname } from "next/navigation";
 
 const TABS: { href: string; label: string }[] = [
   { href: "/admin", label: "ภาพรวม" },
-  { href: "/admin/categories", label: "ประเภท / จัดสาย" },
-  { href: "/admin/teams", label: "ทีม / นักกีฬา" },
-  { href: "/admin/import", label: "นำเข้า" },
-  { href: "/admin/schedule", label: "ตาราง / สถานี" },
+  { href: "/admin/categories", label: "ประเภท / เกณฑ์" },
+  { href: "/admin/import", label: "นำเข้ารายชื่อ" },
+  { href: "/admin/photos", label: "ถ่ายรูป" },
   { href: "/admin/sponsors", label: "สปอนเซอร์" },
   { href: "/admin/settings", label: "ตั้งค่างาน" },
-  { href: "/admin/photos", label: "ถ่ายรูป" },
-  { href: "/admin/result", label: "กรอกผล" },
   { href: "/checkin", label: "เช็กอิน" },
 ];
 

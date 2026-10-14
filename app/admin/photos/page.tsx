@@ -1,38 +1,32 @@
 import { data } from "@/lib/data";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { PhotoStudioClient } from "@/components/admin/PhotoStudioClient";
-import { groupPersons } from "@/lib/people";
-import { shortCategoryName } from "@/lib/view";
 
 export const dynamic = "force-dynamic";
 
 export default async function PhotosPage() {
-  const [games, categories, teams, players, photos] = await Promise.all([
-    data.getGames(),
+  const [categories, competitors, entries, photos] = await Promise.all([
     data.getCategories(),
-    data.getTeams(),
-    data.getPlayers(),
+    data.getCompetitors(),
+    data.getEntries(),
     data.getPhotos(),
   ]);
-  const persons = groupPersons(players, teams).map((p) => ({
-    key: p.key,
-    name: p.primary.real_name ?? p.primary.in_game_name,
-    ign: p.primary.in_game_name,
-    teams: [...new Set(p.teams.map((t) => t.short_name ?? t.name))].join(" · "),
-    categories: p.players
-      .map((pl) => {
-        const t = teams.find((x) => x.id === pl.team_id);
-        const c = categories.find((x) => x.id === t?.category_id);
-        const g = games.find((x) => x.id === c?.game_id);
-        return c ? shortCategoryName(c.name, g?.name ?? "") : "";
-      })
+  // 1 คน = 1 แถว (รูปผูกกับ person_key ใช้ได้ทุกประเภทที่ลง)
+  const persons = competitors.map((c) => ({
+    key: c.person_key,
+    name: `${c.name_th} (${c.code})`,
+    ign: c.name_en,
+    teams: c.shop ?? "",
+    categories: entries
+      .filter((e) => e.competitor_id === c.id)
+      .map((e) => categories.find((x) => x.id === e.category_id)?.name ?? "")
       .filter(Boolean)
       .join(" · "),
   }));
   return (
     <div className="space-y-4">
       <AdminNav />
-      <h1 className="text-xl font-bold">ถ่ายรูปนักกีฬา (กรีนสกรีน)</h1>
+      <h1 className="text-xl font-bold">ถ่ายรูปผู้แข่ง (กรีนสกรีน)</h1>
       <PhotoStudioClient persons={persons} photos={photos} />
     </div>
   );
