@@ -2,13 +2,13 @@ import React from "react";
 import Image from "next/image";
 
 // คอมโพเนนต์แบรนด์กลาง — ทุกหน้าเรียกจากที่นี่ (ห้ามเขียนโลโก้กระจายเอง)
-// ตอนนี้ยังไม่มีไฟล์โลโก้ → แสดงตัวอักษร "PMAT" + ชื่องาน · ใส่ไฟล์จริงที่ public/brand/ แล้วตั้งค่า BRAND.logoSrc / BRAND.sealSrc ที่นี่ที่เดียว
+// ตรา = โลโก้ PMAT (public/brand/pmat-logo.png) · ชื่องานยังเป็นตัวอักษร (logoSrc ว่าง) · เปลี่ยนไฟล์ได้ที่ BRAND.logoSrc / BRAND.sealSrc ที่นี่ที่เดียว
 
 export const BRAND = {
   /** ไฟล์โลโก้งาน (เช่น "/brand/ebw-logo.png") — ว่าง = ใช้ตัวอักษร */
   logoSrc: undefined as string | undefined,
-  /** ไฟล์ตราสมาคม PMAT (เช่น "/brand/pmat-seal.png") — ว่าง = ใช้ตัวอักษร */
-  sealSrc: undefined as string | undefined,
+  /** ไฟล์ตราสมาคม PMAT — ว่าง = ใช้ตราตัวอักษร */
+  sealSrc: "/brand/pmat-logo.png" as string | undefined,
   alt: "Eastern Beauty & Wellness Championship 2026",
   sealAlt: "สมาคม PMAT",
   organizer: "สมาคม PMAT",

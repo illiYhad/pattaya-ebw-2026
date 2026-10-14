@@ -79,8 +79,8 @@ function CategoryCard({ c, count }: { c: Category; count: number }) {
             เกณฑ์ {c.criteria.length ? `${c.criteria.length} ข้อ รวม ${live.total}${live.blank ? ` (ว่าง ${live.blank})` : ""}` : "ยังไม่มี"}
           </div>
           {c.pending_notes.length > 0 && (
-            <ul className="mt-2 space-y-0.5 text-xs text-amber-200">
-              {c.pending_notes.map((n) => <li key={n}>⏸ รอยืนยัน: {n}</li>)}
+            <ul className="mt-2 space-y-0.5 text-xs text-muted">
+              {c.pending_notes.map((n) => <li key={n}>📝 {n}</li>)}
             </ul>
           )}
         </div>
@@ -113,7 +113,7 @@ function CategoryCard({ c, count }: { c: Category; count: number }) {
 
           <div>
             <div className="mb-1 flex items-center justify-between text-xs text-muted">
-              <span>เกณฑ์ให้คะแนน (คะแนนเต็มต่อข้อ เว้นว่างได้ = รอยืนยัน)</span>
+              <span>เกณฑ์ให้คะแนน (คะแนนเต็มต่อข้อ เว้นว่างได้ = ไม่มีคะแนนต่อข้อ ใช้คะแนนรวมเต็ม 100)</span>
               <span className={sum === 100 ? "text-emerald-400" : "text-amber-300"}>รวม {sum}{blank ? ` · ว่าง ${blank} ข้อ` : ""}{f.criteria.length && sum !== 100 && !blank ? " (ไม่ใช่ 100)" : ""}</span>
             </div>
             <div className="space-y-1">
@@ -130,7 +130,7 @@ function CategoryCard({ c, count }: { c: Category; count: number }) {
           </div>
 
           <label className="flex flex-col text-xs text-muted">
-            ข้อที่รอครูหนึ่งยืนยัน (บรรทัดละ 1 ข้อ · ว่าง = ไม่มี)
+            หมายเหตุ (บรรทัดละ 1 ข้อ · ว่าง = ไม่มี · แสดงเฉพาะในแอดมิน)
             <textarea className={`${inp} h-24`} value={f.pending_notes} onChange={(e) => set("pending_notes", e.target.value)} />
           </label>
 

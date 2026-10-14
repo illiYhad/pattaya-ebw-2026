@@ -6,7 +6,7 @@ export const MEDIUM_LABEL: Record<Medium, string> = { live_model: "คนจร�
 
 /** "10.00–11.30 (90 นาที)" · ส่งล่วงหน้า = "ส่งผลงาน" */
 export function timeRangeOf(c: Pick<Category, "session" | "start_time" | "end_time" | "duration_min">): string {
-  if (c.session === "submit") return "ส่งผลงาน";
+  if (c.session === "submit") return "ส่งผลงานล่วงหน้าก่อนวันแข่ง";
   const range = c.start_time && c.end_time ? `${c.start_time}–${c.end_time}` : c.start_time ?? "";
   const dur = c.duration_min ? `${c.duration_min} นาที` : "";
   return [range, dur && (range ? `(${dur})` : dur)].filter(Boolean).join(" ") || "-";
@@ -15,6 +15,12 @@ export function timeRangeOf(c: Pick<Category, "session" | "start_time" | "end_ti
 /** คะแนนเต็มรวมของเกณฑ์ที่มีตัวเลข + จำนวนข้อที่ยังว่าง */
 export function criteriaSummary(c: Pick<Category, "criteria">): { total: number; blank: number } {
   return { total: c.criteria.reduce((a, x) => a + (x.max ?? 0), 0), blank: c.criteria.filter((x) => x.max === undefined).length };
+}
+
+/** ข้อความเกณฑ์สำหรับหน้าสาธารณะ · ทุกข้อมีคะแนน = "เกณฑ์ N ข้อ" · ไม่มีคะแนนต่อข้อ = "คะแนนรวม เต็ม 100" */
+export function scoringLabel(c: Pick<Category, "criteria">): string {
+  const scored = c.criteria.length > 0 && c.criteria.every((x) => x.max !== undefined);
+  return scored ? `เกณฑ์ ${c.criteria.length} ข้อ` : "คะแนนรวม เต็ม 100";
 }
 
 /** วันที่ภาษาไทยแบบสั้น เช่น "ศุกร์ 30 ต.ค. 2569" (พ.ศ.) */

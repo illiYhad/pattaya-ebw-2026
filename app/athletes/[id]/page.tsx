@@ -4,7 +4,7 @@ import { data } from "@/lib/data";
 import { Avatar } from "@/components/profile/Avatar";
 import { EventMark, Seal } from "@/components/brand/Brand";
 import { publicPhoto } from "@/lib/people";
-import { MEDIUM_LABEL, SESSION_LABEL, timeRangeOf } from "@/lib/view";
+import { MEDIUM_LABEL, SESSION_LABEL, scoringLabel, timeRangeOf } from "@/lib/view";
 
 export const revalidate = 30;
 
@@ -64,7 +64,7 @@ export default async function AthletePage({ params }: { params: Promise<{ id: st
               <div className="mt-1 flex flex-wrap gap-x-3 text-xs text-muted">
                 {c.medium && <span>{MEDIUM_LABEL[c.medium]}</span>}
                 <span>กรรมการ {c.judge_count} คน</span>
-                <span>เกณฑ์ {c.criteria.length ? `${c.criteria.length} ข้อ` : "รอยืนยัน"}</span>
+                <span>{scoringLabel(c)}</span>
                 <span>{entry.is_checked_in ? "✅ เช็กอินแล้ว" : "⬜ ยังไม่เช็กอิน"}</span>
               </div>
             </div>

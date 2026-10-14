@@ -54,7 +54,7 @@ export default async function AdminPage() {
                 <th className="text-center">เช็กอิน</th>
                 <th className="text-left">เกณฑ์</th>
                 <th className="text-center">กรรมการ</th>
-                <th className="text-left">รอยืนยัน</th>
+                <th className="text-left">หมายเหตุ</th>
               </tr>
             </thead>
             <tbody>

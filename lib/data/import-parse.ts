@@ -4,13 +4,20 @@
 export type RawRow = { row: number; name_th: string; name_en: string; cat1: string; cat2: string; shop: string };
 type Col = keyof Omit<RawRow, "row">;
 
+// ทุก regex ล็อกทั้งช่อง (^…$ หลัง trim) กันค่าข้อมูลเช่น "thai_massage" หรือร้าน "ร้านสวยใส" ถูกเข้าใจว่าเป็นหัวตาราง
 const HEAD: Record<Col, RegExp[]> = {
-  name_th: [/ชื่อ\s*ไทย/, /ชื่อ\s*-\s*นามสกุล/, /^ชื่อ$/, /name_th/i, /thai/i],
-  name_en: [/อังกฤษ/, /name_en/i, /english/i],
-  cat1: [/ประเภท\s*(1|๑|ที่\s*1)/, /^ประเภท$/, /category\s*1/i, /^category$/i],
-  cat2: [/ประเภท\s*(2|๒|ที่\s*2)/, /category\s*2/i],
-  shop: [/ร้าน/, /สังกัด/, /shop/i, /salon/i],
+  name_th: [/^ชื่อ\s*ไทย$/, /^ชื่อ\s*-\s*นามสกุล$/, /^ชื่อ$/, /^name_th$/i, /^thai\s*name$/i],
+  name_en: [/^ชื่อ\s*อังกฤษ$/, /^อังกฤษ$/, /^name_en$/i, /^english\s*name$/i],
+  cat1: [/^ประเภท\s*(1|๑|ที่\s*1)$/, /^ประเภท$/, /^category\s*1$/i, /^category$/i],
+  cat2: [/^ประเภท\s*(2|๒|ที่\s*2)$/, /^category\s*2$/i],
+  shop: [/^ร้าน$/, /^สังกัด$/, /^ร้าน\s*\/\s*สังกัด$/, /^shop$/i, /^salon$/i],
 };
+
+/** นับเป็นหัวตารางเมื่ออย่างน้อย 2 ช่องในแถวแรกตรงชื่อหัวคอลัมน์ทั้งช่อง */
+export function isHeaderRow(cells: string[]): boolean {
+  const allHead = Object.values(HEAD).flat();
+  return cells.filter((c) => allHead.some((re) => re.test(c.trim()))).length >= 2;
+}
 
 export function parseImportTable(text: string): { rows: RawRow[]; errors: string[] } {
   const lines = text
@@ -30,8 +37,7 @@ export function parseImportTable(text: string): { rows: RawRow[]; errors: string
   };
 
   const first = split(lines[0]);
-  const allHead = Object.values(HEAD).flat();
-  const isHeader = first.some((c) => allHead.some((re) => re.test(c)));
+  const isHeader = isHeaderRow(first);
   const errors: string[] = [];
   let map: Partial<Record<Col, number>> = { name_th: 0, name_en: 1, cat1: 2, cat2: 3, shop: 4 };
   let start = 0;
@@ -39,7 +45,7 @@ export function parseImportTable(text: string): { rows: RawRow[]; errors: string
     map = {};
     first.forEach((c, i) => {
       for (const [k, res] of Object.entries(HEAD) as [Col, RegExp[]][]) {
-        if (map[k] === undefined && res.some((re) => re.test(c))) { map[k] = i; break; }
+        if (map[k] === undefined && res.some((re) => re.test(c.trim()))) { map[k] = i; break; }
       }
     });
     if (map.name_th === undefined) errors.push("หัวตารางไม่มีคอลัมน์ \"ชื่อไทย\"");

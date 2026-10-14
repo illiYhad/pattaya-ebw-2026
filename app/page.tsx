@@ -64,8 +64,7 @@ export default async function Home() {
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {cats.map((c) => (
                   <Link key={c.id} href={`/athletes?cat=${c.code}`} className="relative rounded-xl border border-white/5 bg-surface p-4 hover:border-accent/60">
-                    {/* pr-16 กันชื่อยาวชนป้าย "รอยืนยัน" มุมขวาบน */}
-                    <div className="pr-16 text-lg font-bold leading-tight">{c.name}</div>
+                    <div className="text-lg font-bold leading-tight">{c.name}</div>
                     <div className="text-xs text-muted">{c.name_en}</div>
                     <div className="mt-2 text-sm text-accent">{timeRangeOf(c)}</div>
                     <div className="mt-1 flex flex-wrap gap-x-3 text-xs text-muted">
@@ -73,7 +72,6 @@ export default async function Home() {
                       <span>ผู้แข่ง {countOf(c.id)} คน</span>
                       <span>กรรมการ {c.judge_count} คน</span>
                     </div>
-                    {c.pending_notes.length > 0 && <span className="absolute right-3 top-3 rounded bg-amber-500/20 px-1.5 text-[10px] text-amber-300">รอยืนยัน</span>}
                   </Link>
                 ))}
               </div>

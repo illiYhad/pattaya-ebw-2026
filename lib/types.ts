@@ -3,7 +3,7 @@
 export type Session = "morning" | "afternoon" | "submit";
 export type Medium = "live_model" | "mannequin" | "skin_sheet";
 
-/** เกณฑ์ให้คะแนน 1 ข้อ · max ว่าง = ยังไม่มีคะแนนเต็มต่อข้อ (รอยืนยัน) */
+/** เกณฑ์ให้คะแนน 1 ข้อ · max ว่าง = ไม่มีคะแนนต่อข้อ (กรรมการให้คะแนนรวมเต็ม 100) */
 export type Criterion = { name: string; max?: number };
 
 export type Category = {
@@ -19,9 +19,9 @@ export type Category = {
   /** ใช้อะไรแข่ง (ว่าง = โปสเตอร์ไม่ระบุ) */
   medium?: Medium;
   criteria: Criterion[];
-  /** จำนวนกรรมการ (ตั้งค่าได้ · ค่าเริ่ม 3 รอครูหนึ่งยืนยัน) */
+  /** จำนวนกรรมการ (ตั้งค่าได้ · ค่าเริ่ม 3) */
   judge_count: number;
-  /** ข้อที่ยังรอครูหนึ่งยืนยัน — แอดมินแสดงป้าย "รอยืนยัน" · ห้ามเดา */
+  /** หมายเหตุภายในของประเภท — แสดงเฉพาะแอดมิน (ไม่แสดงหน้าสาธารณะ) */
   pending_notes: string[];
   sort_order: number;
   updated_at: string;
