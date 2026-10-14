@@ -141,7 +141,8 @@ export function StreamHubClient({ channelKey, categories, competitors, entries }
         </ul>
       </aside>
 
-      <section>
+      {/* min-w-0: iframe 1920px ข้างในต้องไม่ดันคอลัมน์กริดให้กว้างเกินจอ */}
+      <section className="min-w-0">
         <div ref={boxRef} className="relative aspect-video w-full overflow-hidden rounded border border-white/10 bg-black">
           {previewSrc && (
             <iframe key={previewSrc} src={previewSrc} title="พรีวิว overlay" style={{ width: 1920, height: 1080, transform: `scale(${scale})`, transformOrigin: "top left", border: 0 }} />
@@ -151,7 +152,7 @@ export function StreamHubClient({ channelKey, categories, competitors, entries }
           พรีวิว = หน้า overlay จริง · ฉากปัจจุบัน: <b className="text-accent">{scene}</b>
           {current && <> · {current.comp!.code} {current.comp!.name_th} · {category?.name}</>}
         </p>
-        {previewSrc && <p className="text-xs text-muted">URL สำหรับ OBS (Browser Source 1920×1080): <code className="select-all">{previewSrc}</code></p>}
+        {previewSrc && <p className="text-xs text-muted">URL สำหรับ OBS (Browser Source 1920×1080): <code className="select-all break-all">{previewSrc}</code></p>}
       </section>
 
       <aside className="space-y-4">
