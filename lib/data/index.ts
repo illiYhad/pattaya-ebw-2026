@@ -1,8 +1,7 @@
-import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { mockSource } from "./mock";
-import { supabaseSource } from "./supabase";
 import type { DataSource } from "./source";
 
-// มี NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY → Supabase · ไม่มี → mock ในหน่วยความจำ (โหมดทดสอบ ไม่มีล็อกอิน)
-export const data: DataSource = hasSupabaseEnv ? supabaseSource : mockSource;
+// ใบ K-P1: ใช้ mock ในหน่วยความจำเท่านั้น (ห้ามต่อ Supabase) — แหล่งข้อมูล Supabase สำหรับโมเดลใหม่
+// (competitors / entries / categories) ยังไม่มี ต้องเขียนในใบถัดไปพร้อม schema · ล็อกอินยังใช้ lib/supabase/* ได้ถ้ามี env
+export const data: DataSource = mockSource;
 export type { DataSource };

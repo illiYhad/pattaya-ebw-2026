@@ -56,5 +56,5 @@ function blocked(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/print/:path*", "/checkin", "/stream-hub", "/api/photos"],
+  matcher: ["/admin/:path*", "/checkin", "/stream-hub", "/api/photos"],
 };

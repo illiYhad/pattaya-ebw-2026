@@ -40,10 +40,8 @@ export async function requireRole(...roles: StaffRole[]): Promise<Staff> {
 
 /** สิทธิ์ตามเส้นทาง (ใช้ทั้ง proxy.ts และหน้าเว็บ) */
 export const PATH_ROLES: { prefix: string; roles: StaffRole[] }[] = [
-  { prefix: "/admin/result", roles: ["admin", "result_staff"] },
   { prefix: "/admin/photos", roles: ["admin", "result_staff"] },
   { prefix: "/admin", roles: ["admin"] },
-  { prefix: "/print", roles: ["admin"] },
   { prefix: "/checkin", roles: ["admin", "result_staff"] },
   { prefix: "/stream-hub", roles: ["admin", "stream_operator"] },
 ];

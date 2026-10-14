@@ -1,61 +1,68 @@
-// ชนิดข้อมูลตาม SCHEMA_v1 ของพี่ศิลา (+ คอลัมน์ที่อลิสขอเพิ่มใน QA บล็อก 9 — รอพี่ศิลายืนยัน)
-export type Game = {
+// ชนิดข้อมูลงาน EBW 2026 — ผู้แข่งรายบุคคล ไม่มีทีม ไม่มีแมตช์ (ใบ K-P1) · ที่มา DATA_EasternBeautyWellness_2026.md
+
+export type Session = "morning" | "afternoon" | "submit";
+export type Medium = "live_model" | "mannequin" | "skin_sheet";
+
+/** เกณฑ์ให้คะแนน 1 ข้อ · max ว่าง = ยังไม่มีคะแนนเต็มต่อข้อ (รอยืนยัน) */
+export type Criterion = { name: string; max?: number };
+
+export type Category = {
   id: string;
-  name: string;
   code: string;
-  format: "team" | "solo";
-  team_size: number;
-};
-
-export type Category = { id: string; game_id: string; code: string; name: string };
-
-export type Station = { id: string; game_id: string; name: string };
-
-// เกมเดี่ยว = ทีม 1 คน
-export type Team = {
-  id: string;
-  category_id: string;
-  /** รหัส อปท. (T01…) — ทีม อปท. เดียวกันในหลายประเภทใช้รหัสเดียวกัน · (คอลัมน์ขอเพิ่ม บล็อก 10) */
-  team_code?: string;
   name: string;
-  short_name?: string;
-  logo_url?: string;
-  /** รูปทีม (บล็อก 10) */
-  photo_url?: string;
-  is_checked_in: boolean;
+  name_en: string;
+  session: Session;
+  /** เวลาเริ่ม–จบ เช่น "10.00" (ว่าง = ประเภทส่งล่วงหน้า) */
+  start_time?: string;
+  end_time?: string;
+  duration_min?: number;
+  /** ใช้อะไรแข่ง (ว่าง = โปสเตอร์ไม่ระบุ) */
+  medium?: Medium;
+  criteria: Criterion[];
+  /** จำนวนกรรมการ (ตั้งค่าได้ · ค่าเริ่ม 3 รอครูหนึ่งยืนยัน) */
+  judge_count: number;
+  /** ข้อที่ยังรอครูหนึ่งยืนยัน — แอดมินแสดงป้าย "รอยืนยัน" · ห้ามเดา */
+  pending_notes: string[];
+  sort_order: number;
+  updated_at: string;
 };
 
-export type Player = {
+export type Competitor = {
   id: string;
-  team_id: string;
-  real_name?: string;
-  in_game_name: string;
-  is_captain: boolean;
-  order_in_team?: number;
-  /** ตำแหน่ง: ROV = เลน · SF6 = ตัวละครหลัก · eFootball = ทีมที่ใช้ (บล็อก 10) */
-  position?: string;
-  /** คำพูดประจำตัว (บล็อก 10) */
-  quote?: string;
-  /** ซ่อนชื่อจริงบนหน้าสาธารณะ — แสดงชื่อในเกมหรืออักษรย่อแทน (บล็อก 10) */
-  hide_real_name?: boolean;
-  /** คนเดียวกันข้ามประเภท = ชื่อจริง + team_code · ใช้ผูกรูปถ่าย (บล็อก 10) */
-  person_key?: string;
+  /** รหัสผู้แข่ง EBW-001 … */
+  code: string;
+  name_th: string;
+  name_en: string;
+  /** ร้าน/สังกัด (ไม่บังคับ) */
+  shop?: string;
+  /** คนเดียวกันข้ามประเภท (ผูกรูป) = ชื่อไทย|ชื่ออังกฤษ แบบ normalize */
+  person_key: string;
+  updated_at: string;
 };
 
-/** รูปนักกีฬา 1 แถวต่อคน (ตาราง athlete_photos · บล็อก 10) — URL ชี้ไป /api/photos/… (mock) หรือ Storage (Supabase) */
+/** ผู้แข่ง 1 คน ลง 1 ประเภท = 1 แถว · คนเดียวลงได้ไม่เกิน 2 ประเภท */
+export type Entry = {
+  id: string;
+  competitor_id: string;
+  category_id: string;
+  is_checked_in: boolean;
+  updated_at: string;
+};
+
+/** รูปผู้แข่ง 1 แถวต่อคน — URL ชี้ไป /api/photos/… */
 export type AthletePhoto = {
   id: string;
   person_key: string;
   original_url: string;
   cutout_url: string;
-  /** ได้รับความยินยอมให้ใช้รูป (เยาวชน = ผู้ปกครอง) — false = ไม่แสดงบนหน้าสาธารณะ */
+  /** ได้รับความยินยอมให้ใช้รูป — false = ไม่แสดงบนหน้าสาธารณะ */
   consent: boolean;
   updated_at: string;
 };
 
-/** ตั้งค่างาน (ตาราง event_config แถวเดียว · ขอเพิ่ม บล็อก 10) */
+/** ตั้งค่างาน (แถวเดียว) */
 export type EventConfig = {
-  /** วันแข่ง 1–4 (YYYY-MM-DD) */
+  /** วันแข่ง (YYYY-MM-DD) */
   days: string[];
   /** ข้อความประกาศหน้าแรก (ว่าง = ไม่แสดง) */
   announcement: string;
@@ -64,58 +71,27 @@ export type EventConfig = {
   updated_at: string;
 };
 
-/** ผลพรีวิว/นำเข้ารายชื่อจากข้อความรูปแบบ ROSTER */
-export type ImportPreview = {
-  newCategories: string[];
-  unknownGames: string[];
-  newTeams: number;
-  existingTeams: number;
-  newPlayers: number;
-  existingPlayers: number;
+export type ImportRowStatus = "new" | "existing" | "error";
+/** 1 แถวจากตารางที่วางในหน้านำเข้า */
+export type ImportRow = {
+  row: number;
+  name_th: string;
+  name_en: string;
+  shop?: string;
+  /** ชื่อประเภทที่จับคู่ได้ */
+  categories: string[];
+  status: ImportRowStatus;
   errors: string[];
 };
 
-export type MatchStatus = "scheduled" | "ongoing" | "ended" | "certified";
-
-export type GameScore = { a: number; b: number };
-
-/** ส่วนของสาย: winners = สายบน/น็อกเอาต์ · losers = สายล่าง (double) · final = Grand Final (double) · third = ชิงอันดับ 3 · group = แบ่งกลุ่ม/พบกันหมด */
-export type MatchStage = "winners" | "losers" | "final" | "third" | "group";
-
-export type Match = {
-  id: string;
-  category_id: string;
-  station_id?: string;
-  round_name: string;
-  /** (คอลัมน์ขอเพิ่ม บล็อก 10) โครงสร้างสาย */
-  stage?: MatchStage;
-  round_no?: number;
-  group_name?: string;
-  sort_order?: number;
-  best_of: number;
-  status: MatchStatus;
-  scheduled_time?: string;
-  team_a_id?: string;
-  team_b_id?: string;
-  team_a_score: number;
-  team_b_score: number;
-  winner_id?: string;
-  next_match_id?: string;
-  next_match_slot?: "a" | "b";
-  loser_next_match_id?: string;
-  loser_next_match_slot?: "a" | "b";
-  game_scores: GameScore[];
-  reported_by?: string;
-  certified_by?: string;
-  updated_at: string;
-};
-
-export type MatchAuditLog = {
-  id: string;
-  match_id: string;
-  staff_id?: string;
-  action_details: string;
-  created_at: string;
+export type ImportPreview = {
+  rows: ImportRow[];
+  newCompetitors: number;
+  existingCompetitors: number;
+  newEntries: number;
+  existingEntries: number;
+  /** ข้อผิดพลาดระดับตาราง (ไม่ใช่รายแถว) */
+  errors: string[];
 };
 
 export type SponsorLevel = "main" | "co" | "support";
@@ -131,27 +107,7 @@ export type Sponsor = {
   is_active: boolean;
 };
 
-export type BracketFormat = "single" | "double" | "round_robin" | "groups";
-export type SeedingMode = "random" | "manual";
-export type SingleEntryResolution = "pending" | "walkover" | "merge" | "cancel";
-
-/** ตั้งค่ารูปแบบแข่งต่อประเภท (ตาราง category_settings · ขอเพิ่ม บล็อก 10) */
-export type CategorySetting = {
-  category_id: string;
-  format: BracketFormat;
-  third_place: boolean;
-  group_count: number;
-  advance_per_group: number;
-  /** BO ต่อรอบ key = round_name · key พิเศษ "group" = รอบแบ่งกลุ่ม/พบกันหมด */
-  best_of_by_round: Record<string, number>;
-  seeding: SeedingMode;
-  /** ลำดับทีม (id) ที่ใช้วางสาย — จากจับสลากหรือเรียงเอง */
-  seed_order: string[];
-  single_entry: SingleEntryResolution;
-  merge_into_category_id?: string;
-  updated_at: string;
-};
-
 export type StaffRole = "admin" | "result_staff" | "stream_operator";
 
-export type Scene = "STARTING" | "LIVE" | "BREAK" | "RESULT" | "BRACKET" | "SPONSOR";
+/** ฉากบน overlay (ไม่มี BRACKET แล้ว) */
+export type Scene = "STARTING" | "LIVE" | "BREAK" | "RESULT" | "SPONSOR";

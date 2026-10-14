@@ -3,61 +3,32 @@ import { subscribeDataChanges } from "./live";
 import { db } from "./store";
 import { Engine, type Ctx } from "./engine";
 import { photoIdFor } from "@/lib/people";
-import { DEFAULT_SETTING } from "@/lib/bracket/generate";
 
-// แหล่งข้อมูลจำลองในหน่วยความจำ — กติกาทั้งหมดอยู่ใน engine.ts (ใช้ร่วมกับ Supabase)
+// แหล่งข้อมูลจำลองในหน่วยความจำ — กติกาทั้งหมดอยู่ใน Engine
 const NOW = () => new Date().toISOString();
 let seq = 0;
-const ctx: Ctx = {
-  now: NOW,
-  newId: (prefix) => `${prefix}-${Date.now().toString(36)}-${(++seq).toString(36)}`,
-};
+const ctx: Ctx = { now: NOW, newId: (prefix) => `${prefix}-${Date.now().toString(36)}-${(++seq).toString(36)}` };
 const engine = () => new Engine(db, ctx);
 
-const inGame = <T extends { category_id: string }>(rows: T[], gameId?: string) =>
-  gameId ? rows.filter((r) => db.categories.find((c) => c.id === r.category_id)?.game_id === gameId) : rows;
-
 export const mockSource: DataSource = {
-  async getGames() { return db.games; },
-  async getCategories(gameId) { return gameId ? db.categories.filter((c) => c.game_id === gameId) : db.categories; },
-  async getTeams(gameId) { return inGame(db.teams, gameId); },
-  async getPlayers(gameId) {
-    if (!gameId) return db.players;
-    const ids = new Set(inGame(db.teams, gameId).map((t) => t.id));
-    return db.players.filter((p) => ids.has(p.team_id));
-  },
-  async getStations(gameId) { return gameId ? db.stations.filter((x) => x.game_id === gameId) : db.stations; },
-  async getMatches(gameId) { return inGame(db.matches, gameId); },
+  async getCategories() { return [...db.categories].sort((a, b) => a.sort_order - b.sort_order); },
+  async getCompetitors() { return db.competitors; },
+  async getEntries(categoryId) { return categoryId ? db.entries.filter((e) => e.category_id === categoryId) : db.entries; },
   async getSponsors() { return db.sponsors; },
-  async getAuditLogs(matchId) { return db.audit.filter((a) => a.match_id === matchId); },
-  async getCategorySettings() { return db.categories.map((c) => db.settings.find((s) => s.category_id === c.id) ?? DEFAULT_SETTING(c.id)); },
   async getEventConfig() { return db.eventConfig; },
   async getPhotos() { return db.photos; },
 
-  async saveProgress(matchId, scores) { return engine().saveProgress(matchId, scores); },
-  async saveResult(matchId, scores) { return engine().saveResult(matchId, scores); },
-  async certifyMatch(matchId) { return engine().certifyMatch(matchId); },
-  async uncertifyMatch(matchId) { return engine().uncertifyMatch(matchId); },
-  async setCheckIn(teamId, checkedIn) { return engine().setCheckIn(teamId, checkedIn); },
+  async saveCategory(categoryId, patch) { return engine().saveCategory(categoryId, patch); },
 
-  async saveCategorySetting(categoryId, patch) { return engine().saveCategorySetting(categoryId, patch); },
-  async drawSeedOrder(categoryId) { return engine().drawSeedOrder(categoryId); },
-  async generateBracket(categoryId) { return engine().generateBracket(categoryId); },
-  async generateKnockout(categoryId) { return engine().generateKnockout(categoryId); },
-  async resolveSingleEntry(categoryId, resolution, mergeInto) { return engine().resolveSingleEntry(categoryId, resolution, mergeInto); },
-
-  async createTeam(categoryId, input) { return engine().createTeam(categoryId, input); },
-  async updateTeam(teamId, patch) { return engine().updateTeam(teamId, patch); },
-  async deleteTeam(teamId) { engine().deleteTeam(teamId); },
-  async createPlayer(teamId, input) { return engine().createPlayer(teamId, input); },
-  async updatePlayer(playerId, patch) { return engine().updatePlayer(playerId, patch); },
-  async deletePlayer(playerId) { engine().deletePlayer(playerId); },
+  async createCompetitor(input, categoryIds) { return engine().createCompetitor(input, categoryIds); },
+  async updateCompetitor(competitorId, patch) { return engine().updateCompetitor(competitorId, patch); },
+  async deleteCompetitor(competitorId) { engine().deleteCompetitor(competitorId); },
+  async addEntry(competitorId, categoryId) { return engine().addEntry(competitorId, categoryId); },
+  async removeEntry(entryId) { engine().removeEntry(entryId); },
+  async setEntryCheckIn(entryId, checkedIn) { return engine().setEntryCheckIn(entryId, checkedIn); },
 
   async previewImport(text) { return engine().previewImport(text); },
   async applyImport(text) { return engine().applyImport(text); },
-
-  async updateMatchSchedule(matchId, patch) { return engine().updateMatchSchedule(matchId, patch); },
-  async autoQueue(gameId) { return engine().autoQueue(gameId); },
 
   async createSponsor(input) { return engine().createSponsor(input); },
   async updateSponsor(sponsorId, patch) { return engine().updateSponsor(sponsorId, patch); },

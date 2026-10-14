@@ -2,36 +2,31 @@ import { createClient, type RealtimeChannel, type SupabaseClient } from "@supaba
 import type { Scene } from "@/lib/types";
 
 // ชื่อ channel มีรหัสลับต่องาน (CHANNEL_KEY ฝั่ง server) กันคนนอกเดาชื่อแล้วยิงเข้า channel
-export const matchChannelName = (key: string, matchId: string) => `ebw-${key}-match-${matchId}`;
+// 1 channel ต่อ 1 รายการแข่ง (entry = ผู้แข่ง × ประเภท)
+export const entryChannelName = (key: string, entryId: string) => `ebw-${key}-entry-${entryId}`;
 
 export const EVENTS = {
   sceneChange: "scene_change",
   hudNotification: "hud_notification",
   hudNotificationClear: "hud_notification_clear",
-  scoreUpdate: "score_update",
   stingerPlay: "stinger_play",
-  /** มุมของตราทางการ (OfficialBug) บนฉาก LIVE — คนคุมจอหลบ UI ของเกมได้ */
+  /** มุมของตราทางการ (OfficialBug) บนฉาก LIVE */
   brandBug: "brand_bug",
-  /** ตำแหน่งแถบคะแนนบางบนฉาก LIVE (บน/ล่าง) */
-  scoreBar: "score_bar",
-  /** แสดง/ซ่อนรายชื่อผู้เล่น (มีผลเฉพาะฉาก STARTING) */
-  rosterShow: "roster_show",
+  /** ป้ายชื่อผู้แข่ง (lower third) บนฉาก LIVE */
+  lowerThird: "lower_third",
 } as const;
 
 export type HudTone = "info" | "warn" | "alert";
 /** tl = ซ้ายบน · tr = ขวาบน · bl = ซ้ายล่าง (ค่าเริ่มต้น) · br = ขวาล่าง · hidden = ซ่อน */
 export type BugCorner = "tl" | "tr" | "bl" | "br" | "hidden";
-export type ScoreBarPosition = "top" | "bottom";
 
 export type HubEventMap = {
   scene_change: { scene: Scene };
-  score_update: { a_series: number; b_series: number; games: { a: number; b: number }[] };
   hud_notification: { text: string; tone: HudTone };
   hud_notification_clear: Record<string, never>;
   stinger_play: { then_scene?: Scene };
   brand_bug: { corner: BugCorner };
-  score_bar: { position: ScoreBarPosition };
-  roster_show: { show: boolean };
+  lower_third: { show: boolean };
 };
 export type HubEventName = keyof HubEventMap;
 

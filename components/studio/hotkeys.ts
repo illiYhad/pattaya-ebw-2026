@@ -16,7 +16,6 @@ export const SCENE_ACTIONS: (HotkeyAction & { scene: Scene })[] = [
   { id: "LIVE", label: "2. Live", scene: "LIVE" },
   { id: "BREAK", label: "3. Break", scene: "BREAK" },
   { id: "RESULT", label: "4. Result", scene: "RESULT" },
-  { id: "BRACKET", label: "5. Bracket", scene: "BRACKET" },
   { id: "SPONSOR", label: "6. Sponsor", scene: "SPONSOR" },
 ];
 
@@ -31,7 +30,6 @@ export const DEFAULT_HOTKEYS: HotkeyMap = {
   LIVE: "Alt+2",
   BREAK: "Alt+3",
   RESULT: "Alt+4",
-  BRACKET: "Alt+5",
   SPONSOR: "Alt+6",
   stinger: "Alt+7",
   clearHud: "Alt+C",

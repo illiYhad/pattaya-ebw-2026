@@ -1,57 +1,23 @@
-import type { BracketFormat, Match, MatchStage, SingleEntryResolution, Sponsor, SponsorPosition, Team } from "@/lib/types";
+import type { Category, Medium, Session, Sponsor, SponsorPosition } from "@/lib/types";
 
-export const nameOf = (list: Team[], id?: string) => list.find((t) => t.id === id)?.name ?? "รอผลคู่ก่อนหน้า";
+export const SESSION_LABEL: Record<Session, string> = { morning: "ช่วงเช้า", afternoon: "ช่วงบ่าย", submit: "ส่งผลงานล่วงหน้า" };
+export const SESSION_ORDER: Session[] = ["morning", "afternoon", "submit"];
+export const MEDIUM_LABEL: Record<Medium, string> = { live_model: "คนจริง", mannequin: "หัวหุ่น", skin_sheet: "แผ่นหนัง" };
 
-export const timeOf = (iso?: string) =>
-  iso
-    ? new Date(iso).toLocaleString("th-TH", { timeZone: "Asia/Bangkok", dateStyle: "short", timeStyle: "short" })
-    : "-";
-
-export const statusLabel: Record<Match["status"], string> = {
-  scheduled: "รอแข่ง",
-  ongoing: "กำลังแข่ง",
-  ended: "จบ รอรับรอง",
-  certified: "รับรองแล้ว",
-};
-
-export const formatLabel: Record<BracketFormat, string> = {
-  single: "แพ้คัดออก",
-  double: "แพ้สองครั้งคัดออก",
-  round_robin: "พบกันหมด",
-  groups: "แบ่งกลุ่ม + น็อกเอาต์",
-};
-
-export const singleEntryLabel: Record<SingleEntryResolution, string> = {
-  pending: "ยังไม่เลือก",
-  walkover: "ได้รางวัลโดยไม่มีคู่แข่ง",
-  merge: "ยุบรวมกับประเภทอื่น",
-  cancel: "ยกเลิกประเภท",
-};
-
-export const stageLabel: Record<MatchStage, string> = {
-  winners: "สายบน / น็อกเอาต์",
-  losers: "สายล่าง",
-  final: "Grand Final",
-  third: "ชิงอันดับ 3",
-  group: "รอบแบ่งกลุ่ม / พบกันหมด",
-};
-
-/** ชื่อประเภทแบบสั้น: "ประเภททีมชาย ROV รุ่น 16 ปี" → "ทีมชาย 16 ปี" */
-export function shortCategoryName(name: string, gameName: string): string {
-  let s = name.replace(/^ประเภท/, "");
-  if (gameName) s = s.replace(gameName, "");
-  s = s.replace(/Street Fighter 6|eFootball Mobile|eFootball|ROV/gi, "").replace(/รุ่น/, "").replace(/\(ไม่จำกัดเพศ\)/, "โอเพน");
-  return s.replace(/\s+/g, " ").trim() || name;
+/** "10.00–11.30 (90 นาที)" · ส่งล่วงหน้า = "ส่งผลงาน" */
+export function timeRangeOf(c: Pick<Category, "session" | "start_time" | "end_time" | "duration_min">): string {
+  if (c.session === "submit") return "ส่งผลงาน";
+  const range = c.start_time && c.end_time ? `${c.start_time}–${c.end_time}` : c.start_time ?? "";
+  const dur = c.duration_min ? `${c.duration_min} นาที` : "";
+  return [range, dur && (range ? `(${dur})` : dur)].filter(Boolean).join(" ") || "-";
 }
 
-/** เวลา HH:mm ตามเวลาไทย */
-export const clockOf = (iso?: string) =>
-  iso ? new Date(iso).toLocaleTimeString("th-TH", { timeZone: "Asia/Bangkok", hour: "2-digit", minute: "2-digit" }) : "-";
+/** คะแนนเต็มรวมของเกณฑ์ที่มีตัวเลข + จำนวนข้อที่ยังว่าง */
+export function criteriaSummary(c: Pick<Category, "criteria">): { total: number; blank: number } {
+  return { total: c.criteria.reduce((a, x) => a + (x.max ?? 0), 0), blank: c.criteria.filter((x) => x.max === undefined).length };
+}
 
-/** วันที่ YYYY-MM-DD ตามเวลาไทย (ใช้จับคู่กับวันแข่ง) */
-export const dayKeyOf = (iso?: string) => (iso ? new Date(iso).toLocaleDateString("sv-SE", { timeZone: "Asia/Bangkok" }) : "");
-
-/** วันที่ภาษาไทยแบบสั้น เช่น "จันทร์ 19 ต.ค. 2569" (พ.ศ.) */
+/** วันที่ภาษาไทยแบบสั้น เช่น "ศุกร์ 30 ต.ค. 2569" (พ.ศ.) */
 export function thaiDate(ymd: string): string {
   if (!ymd) return "-";
   const d = new Date(`${ymd}T00:00:00+07:00`);
@@ -60,21 +26,6 @@ export function thaiDate(ymd: string): string {
   const year = part({ year: "numeric" }).replace(/^พ\.ศ\.\s*/, "");
   return `${weekday} ${part({ day: "numeric" })} ${part({ month: "short" })} ${year}`;
 }
-
-/** ISO → ค่าช่อง datetime-local ตามเวลาไทย (YYYY-MM-DDTHH:mm) */
-export function toLocalInput(iso?: string): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  const p = (n: number) => String(n).padStart(2, "0");
-  const parts = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Bangkok", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false,
-  }).formatToParts(d);
-  const get = (t: string) => parts.find((x) => x.type === t)?.value ?? "";
-  return `${get("year")}-${get("month")}-${get("day")}T${p(Number(get("hour")) % 24)}:${get("minute")}`;
-}
-
-/** ค่าช่อง datetime-local (เวลาไทย) → ISO */
-export const fromLocalInput = (v: string) => (v ? new Date(`${v}:00+07:00`).toISOString() : null);
 
 /** สปอนเซอร์ที่เปิดใช้ในตำแหน่งนั้น เรียงตาม sequence */
 export const sponsorsAt = (sponsors: Sponsor[], position: SponsorPosition) =>
