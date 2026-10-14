@@ -2,6 +2,7 @@ import Link from "next/link";
 import { data } from "@/lib/data";
 import { EVENT, SCHEDULE } from "@/lib/event";
 import { EventLogo, Seal, Watermark } from "@/components/brand/Brand";
+import { mockBlocked } from "@/lib/auth";
 import { MEDIUM_LABEL, SESSION_LABEL, SESSION_ORDER, thaiDate, timeRangeOf } from "@/lib/view";
 
 // หน้าสาธารณะ: ไม่ subscribe Realtime — ใช้ revalidate แทน
@@ -22,7 +23,7 @@ export default async function Home() {
           <span className="hidden sm:block"><Seal size={120} priority /></span>
           <span className="sm:hidden"><Seal size={80} priority /></span>
         </div>
-        <h1 className="relative text-3xl font-black text-accent">{EVENT.titleLine2}</h1>
+        <h1 className="sr-only">{EVENT.titleLine2}</h1>
         <div className="relative text-base text-text/90">{EVENT.titleLine1}</div>
         <div className="relative flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
           <span>📅 {thaiDate(day)}</span>
@@ -32,8 +33,8 @@ export default async function Home() {
         {config.announcement && <div className="relative rounded bg-accent-2/15 p-3 text-sm text-text whitespace-pre-line">📢 {config.announcement}</div>}
         <div className="relative flex flex-wrap gap-2 pt-1 text-sm">
           <Link href="/athletes" className="rounded bg-bg px-3 py-1 hover:text-accent">ผู้แข่งทั้งหมด</Link>
-          <Link href="/checkin" className="rounded bg-bg px-3 py-1 hover:text-accent">เช็กอิน</Link>
-          <Link href="/admin" className="rounded bg-bg px-3 py-1 hover:text-accent">แอดมิน</Link>
+          {!mockBlocked && <Link href="/checkin" className="rounded bg-bg px-3 py-1 hover:text-accent">เช็กอิน</Link>}
+          {!mockBlocked && <Link href="/admin" className="rounded bg-bg px-3 py-1 hover:text-accent">แอดมิน</Link>}
         </div>
       </section>
 

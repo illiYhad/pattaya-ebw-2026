@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { EVENT } from "@/lib/event";
 import { EventLogo, Seal } from "@/components/brand/Brand";
+import { mockBlocked } from "@/lib/auth";
 import { UserBadge } from "@/components/auth/UserBadge";
 
 /** หัวเว็บทุกหน้า (ยกเว้น overlay ที่ซ่อนด้วย CSS): โลโก้งานซ้าย · เมนู · ผู้ใช้ + ตราสมาคมขวา */
@@ -13,9 +14,13 @@ export function SiteHeader({ logoSrc }: { logoSrc?: string }) {
       </Link>
       <nav className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
         <Link href="/athletes">ผู้แข่ง</Link>
-        <Link href="/checkin">เช็กอิน</Link>
-        <Link href="/admin">แอดมิน</Link>
-        <Link href="/stream-hub">ห้องคุม</Link>
+        {!mockBlocked && (
+          <>
+            <Link href="/checkin">เช็กอิน</Link>
+            <Link href="/admin">แอดมิน</Link>
+            <Link href="/stream-hub">ห้องคุม</Link>
+          </>
+        )}
       </nav>
       <div className="ml-auto flex items-center gap-3">
         <UserBadge />
