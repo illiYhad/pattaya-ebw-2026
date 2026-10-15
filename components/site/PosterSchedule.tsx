@@ -5,6 +5,17 @@ import styles from "./PosterSchedule.module.css";
 
 const s = (name: string) => styles[name] ?? name;
 
+/** ขนาดจริงของรูปประกอบแถว (กันหน้ากระโดดตอนโหลด) */
+const ART_SIZE: Record<string, [number, number]> = {
+  "01-shell.png": [330, 172],
+  "02-mic.png": [330, 180],
+  "03-plaque.png": [330, 180],
+  "04-cosmetics.png": [316, 180],
+  "05-buffet.png": [330, 180],
+  "06-chair.png": [330, 184],
+  "07-teacup.png": [330, 168],
+};
+
 /** นาฬิกาเข็มชี้ตรงเวลาเริ่ม · ขอบโรสโกลด์ หน้าปัดครีม 12 ขีด · gradient อ้างจาก <defs> ชุดเดียวของส่วนนี้ */
 function Clock({ start }: { start: string }) {
   const { hour, minute } = handAngles(start);
@@ -83,7 +94,6 @@ export function PosterSchedule({ day }: { day: string }) {
                         <span className={s("l")}>
                           {phrases.map((w, wi) => (
                             <React.Fragment key={wi}>
-                              {wi > 0 && !phrases[wi - 1].endsWith(" ") ? " " : null}
                               <span className={s("w")}>{w.trim()}</span>
                               {w.endsWith(" ") ? " " : null}
                             </React.Fragment>
@@ -97,7 +107,7 @@ export function PosterSchedule({ day }: { day: string }) {
                 </span>
                 {row.art && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img className={s("ps-ico")} src={`/schedule/${row.art}`} alt="" width={165} height={165} loading="lazy" />
+                  <img className={s("ps-ico")} src={`/schedule/${row.art}`} alt="" width={ART_SIZE[row.art]?.[0] ?? 330} height={ART_SIZE[row.art]?.[1] ?? 180} loading="lazy" />
                 )}
               </li>
             ))}

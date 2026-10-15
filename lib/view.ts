@@ -6,7 +6,7 @@ export const MEDIUM_LABEL: Record<Medium, string> = { live_model: "คนจร�
 
 /** "10.00–11.30 (90 นาที)" · ส่งล่วงหน้า = "ส่งผลงาน" */
 export function timeRangeOf(c: Pick<Category, "session" | "start_time" | "end_time" | "duration_min">): string {
-  if (c.session === "submit") return "ส่งผลงานล่วงหน้าก่อนวันแข่ง";
+  if (c.session === "submit") return "ส่งผลงานล่วงหน้า ก่อนวันแข่ง";
   const range = c.start_time && c.end_time ? `${c.start_time}–${c.end_time}` : c.start_time ?? "";
   const dur = c.duration_min ? `${c.duration_min} นาที` : "";
   return [range, dur && (range ? `(${dur})` : dur)].filter(Boolean).join(" ") || "-";

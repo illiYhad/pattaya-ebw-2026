@@ -68,7 +68,7 @@ export default async function Home() {
                     </div>
                     <div className="text-xl font-semibold leading-snug"><Keep text={c.name} /></div>
                     <div className="text-xs text-muted">{c.name_en}</div>
-                    <div className="num text-[1.4rem] font-semibold text-accent">{timeRangeOf(c)}</div>
+                    <div className="num text-[1.4rem] font-semibold text-accent"><Phrases text={timeRangeOf(c)} /></div>
                     <div className="flex flex-wrap gap-x-3 text-xs text-muted">
                       {c.medium && <span>{MEDIUM_LABEL[c.medium]}</span>}
                       <span>กรรมการ {c.judge_count} คน</span>
@@ -80,13 +80,16 @@ export default async function Home() {
           })}
         </section>
 
-        <p className="text-xs text-muted">ข้อมูลอัปเดตทุก 20 วินาที · ผลคะแนนและอันดับจะแสดงเมื่อประกาศผลแล้ว</p>
         </div>
       </LightShell>
 
-      <div className="relative left-1/2 -mb-4 w-screen -translate-x-1/2">
+      <div className="relative left-1/2 w-screen -translate-x-1/2 bg-[#FBF7F2]">
         <PosterSchedule day={day} />
       </div>
+
+      <LightShell pull={0} className="!pb-16 !pt-8">
+        <p className="text-xs text-muted">ข้อมูลอัปเดตทุก 20 วินาที · ผลคะแนนและอันดับจะแสดงเมื่อประกาศผลแล้ว</p>
+      </LightShell>
     </>
   );
 }
