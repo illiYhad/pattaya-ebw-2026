@@ -1,22 +1,45 @@
 @import "tailwindcss";
 
-/* ธีมสีงาน EBW: น้ำเงินเข้มทะเล · เทอร์ควอยซ์ · โรสโกลด์ · ขาวมุก (จากโปสเตอร์) — เปลี่ยนได้จากตั้งค่างาน */
+/* ธีมแนวโอลิมปิก/ยิมนาสติกลีลา (ใบ K-P1.4): พื้นเข้มม่วงกรม · ทอง · ชมพู · งาช้าง — เปลี่ยนได้จากตั้งค่างาน */
 :root {
-  --bg: #06203A;
-  --surface: #0B3055;
-  --text: #F7F3EE;
-  --muted: #A9C1CC;
-  --accent: #2EC4B6;
-  --accent-2: #E0A890; /* โรสโกลด์: ไฮไลต์ / ผู้ชนะ / เหรียญ */
+  --bg: #120F2E;
+  --surface: #1E1A45;
+  --surface-2: #2C2760;
+  --text: #FFF8F0;
+  --muted: #B9B3D6;
+  --accent: #D8B26A; /* ทอง: ปุ่มหลัก / อันดับ 1 / ตัวเน้น */
+  --accent-2: #E8A0B4; /* ชมพู: ตัวอักษรเน้นบนพื้นเข้ม */
   --live: #EF4444;
-  --brand-navy: #0A3A5C;
-  --brand-blue: #137A8C;
-  --brand-cyan: #9CEDE4;
+  --brand-navy: #2C2760;
+  --brand-blue: #1E1A45;
+  --brand-cyan: #E8A0B4;
+  --gold: #D8B26A;
+  --pink: #E8A0B4;
+  --ivory: #FFF8F0;
+  --silver: #C9CED8;
+  --bronze: #C08457;
+  --font-th: var(--font-kanit), "Noto Sans Thai", system-ui, sans-serif;
+  --font-num: var(--font-barlow), var(--font-kanit), sans-serif;
+}
+
+/* ส่วนเนื้อหาสาธารณะพื้นสว่าง: ทับตัวแปรเฉพาะในขอบเขตนี้ (หน้าสตาฟ/overlay ยังพื้นเข้ม) */
+.light-shell {
+  --bg: #FBF7F2;
+  --surface: #FFFFFF;
+  --surface-2: #EFE6F7;
+  --text: #1B1638;
+  --muted: #5A527F;
+  --accent: #6B4E9E;
+  --accent-2: #4A3478;
+  --border-soft: #E6DDEF;
+  background: #FBF7F2;
+  color: var(--text);
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
   --color-text: var(--text);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
@@ -25,17 +48,32 @@
   --color-brand-navy: var(--brand-navy);
   --color-brand-blue: var(--brand-blue);
   --color-brand-cyan: var(--brand-cyan);
+  --color-gold: var(--gold);
+  --color-pink: var(--pink);
+  --color-ivory: var(--ivory);
 }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: system-ui, "Noto Sans Thai", sans-serif;
+  font-family: var(--font-th);
+  overflow-x: clip;
+  line-height: 1.6;
 }
 
-/* พื้นงาน (ไล่สี navy → blue) ใช้กับรูปนักกีฬา/พรีวิวตัดพื้น */
+/* เมนูมือถือเลื่อนแนวนอนได้ ซ่อนแถบเลื่อน */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.num { font-family: var(--font-num); }
+
+/* หัวเว็บ: ขอบล่างโค้ง · หน้าแรกมี hero ของตัวเองต่อท้าย → ไม่โค้งซ้ำ */
+.site-header { border-radius: 0 0 50% 50% / 0 0 40px 40px; }
+body:has(.hero) .site-header { border-radius: 0; }
+body:has(.hero) .site-header > svg { display: none; }
+
+/* พื้นรูปผู้แข่ง (วงกลม/สี่เหลี่ยม) */
 .brand-bg {
-  background: linear-gradient(160deg, var(--brand-navy) 0%, var(--brand-blue) 100%);
+  background: linear-gradient(160deg, var(--surface-2) 0%, var(--surface) 100%);
 }
 
 @keyframes pop {

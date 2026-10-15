@@ -20,15 +20,31 @@ export const EVENT = {
 export const FIRST_DAY = EVENT.days[0];
 
 /** กำหนดการทั้งวัน (จากโปสเตอร์) */
-export const SCHEDULE: { time: string; label: string }[] = [
-  { time: "08.00–08.30", label: "ลงทะเบียน" },
-  { time: "08.30–09.00", label: "พิธีเปิดงาน" },
-  { time: "09.00–10.00", label: "มอบโล่กรรมการ" },
-  { time: "10.00", label: "เริ่มการแข่งขันทุกประเภท" },
-  { time: "12.00–13.00", label: "อาหารบุฟเฟต์" },
-  { time: "13.00–15.00", label: "ชมโชว์ Prime Speaker" },
-  { time: "15.00–15.30", label: "อาหารว่าง" },
-  { time: "15.30–17.00", label: "ประกาศผล มอบถ้วย ถ่ายรูปร่วม พิธีปิด" },
+export type ScheduleItem = {
+  /** เวลาเริ่ม HH:MM (ใช้หมุนเข็มนาฬิกาและ <time>) */
+  start: string;
+  time: string;
+  label: string;
+  /** ข้อความหลายบรรทัดแบบโปสเตอร์ (แต่ละวลีย่อยห้ามขาดกลางคำ) */
+  lines?: string[][];
+  /** รูปประกอบท้ายแถว (public/schedule/) */
+  art?: string;
+};
+
+export const SCHEDULE: ScheduleItem[] = [
+  { start: "08:00", time: "08.00–08.30", label: "ลงทะเบียน", art: "01-shell.png" },
+  { start: "08:30", time: "08.30–09.00", label: "พิธีเปิดงาน", art: "02-mic.png" },
+  { start: "09:00", time: "09.00–10.00", label: "มอบโล่กรรมการ", art: "03-plaque.png" },
+  { start: "10:00", time: "10.00", label: "เริ่มการแข่งขันทุกประเภท", art: "04-cosmetics.png" },
+  { start: "12:00", time: "12.00–13.00", label: "รับประทานอาหารบุฟเฟต์", art: "05-buffet.png" },
+  { start: "13:00", time: "13.00–15.00", label: "ชมโชว์ Prime Speaker", art: "06-chair.png" },
+  { start: "15:00", time: "15.00–15.30", label: "รับประทานอาหารว่าง", art: "07-teacup.png" },
+  {
+    start: "15:30",
+    time: "15.30–17.00",
+    label: "ประกาศผลรางวัลและมอบถ้วย พร้อมถ่ายรูปร่วมกัน และพิธีปิดงาน",
+    lines: [["ประกาศผลรางวัล", "และมอบถ้วย"], ["พร้อมถ่ายรูปร่วมกัน ", "และพิธีปิดงาน"]],
+  },
 ];
 
 export const STATION_COUNT: Record<string, number> = { ebw: 1 };

@@ -1,7 +1,7 @@
 import { data } from "@/lib/data";
 import { AthletesBrowser, type AthleteItem } from "@/components/profile/AthletesBrowser";
 import { publicPhoto } from "@/lib/people";
-import { Watermark } from "@/components/brand/Brand";
+import { LightShell } from "@/components/site/LightShell";
 
 export const revalidate = 30;
 
@@ -25,10 +25,11 @@ export default async function AthletesPage({ searchParams }: { searchParams: Pro
     .sort((a, b) => a.competitor.code.localeCompare(b.competitor.code));
   const initial = categories.find((c) => c.code === cat)?.id ?? "all";
   return (
-    <div className="relative space-y-4 overflow-hidden">
-      <Watermark height={520} opacity={0.04} />
-      <h1 className="relative text-xl font-bold">ผู้แข่งขัน</h1>
-      <div className="relative"><AthletesBrowser items={items} categories={categories} initialCategory={initial} /></div>
-    </div>
+    <LightShell pull={40} className="min-h-[70vh] pt-14">
+      <div className="space-y-4">
+        <h1 className="text-[2rem] font-semibold">ผู้แข่งขัน</h1>
+        <AthletesBrowser items={items} categories={categories} initialCategory={initial} />
+      </div>
+    </LightShell>
   );
 }

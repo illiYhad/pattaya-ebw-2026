@@ -1,31 +1,34 @@
 import Link from "next/link";
 import { EVENT } from "@/lib/event";
-import { EventLogo, Seal } from "@/components/brand/Brand";
+import { Seal } from "@/components/brand/Brand";
 import { mockBlocked } from "@/lib/auth";
 import { UserBadge } from "@/components/auth/UserBadge";
+import { Ribbons } from "./Ribbons";
 
-/** หัวเว็บทุกหน้า (ยกเว้น overlay ที่ซ่อนด้วย CSS): โลโก้งานซ้าย · เมนู · ผู้ใช้ + ตราสมาคมขวา */
+/** หัวเว็บทุกหน้า (ยกเว้น overlay ที่ซ่อนด้วย CSS): พื้นเข้มขอบล่างโค้ง + แถบทอง/ชมพู · ชื่อ EBW 2026 · เมนู · ผู้ใช้ + ตราสมาคม */
 export function SiteHeader({ logoSrc }: { logoSrc?: string }) {
+  void logoSrc;
   return (
-    <header className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-white/10 bg-surface px-4 py-2">
-      <Link href="/" className="flex items-center" aria-label={EVENT.shortTitle}>
-        <span className="hidden sm:block"><EventLogo variant="white" width={170} src={logoSrc} priority /></span>
-        <span className="sm:hidden"><EventLogo variant="white" width={130} src={logoSrc} priority /></span>
-      </Link>
-      <nav className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
-        <Link href="/athletes">ผู้แข่ง</Link>
-        {!mockBlocked && (
-          <>
-            <Link href="/checkin">เช็กอิน</Link>
-            <Link href="/admin">แอดมิน</Link>
-            <Link href="/stream-hub">ห้องคุม</Link>
-          </>
-        )}
-      </nav>
-      <div className="ml-auto flex items-center gap-3">
-        <UserBadge />
-        <Seal size={36} />
+    <header className="site-header relative z-10 overflow-hidden bg-bg px-4 pt-3 text-ivory">
+      <div className="relative mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2">
+        <Link href="/" className="num order-1 text-[22px] font-bold tracking-[0.22em]" aria-label={EVENT.shortTitle}>EBW 2026</Link>
+        <nav className="no-scrollbar order-3 -mx-4 flex w-[calc(100%+2rem)] flex-nowrap overflow-x-auto px-4 text-base whitespace-nowrap sm:order-2 sm:mx-0 sm:w-auto sm:px-0">
+          <Link href="/" className="flex min-h-11 items-center px-3">หน้าแรก</Link>
+          <Link href="/athletes" className="flex min-h-11 items-center px-3">ผู้แข่งขัน</Link>
+          {!mockBlocked && (
+            <>
+              <Link href="/checkin" className="flex min-h-11 items-center px-3 text-muted">เช็กอิน</Link>
+              <Link href="/admin" className="flex min-h-11 items-center px-3 text-muted">แอดมิน</Link>
+              <Link href="/stream-hub" className="flex min-h-11 items-center px-3 text-muted">ห้องคุม</Link>
+            </>
+          )}
+        </nav>
+        <div className="order-2 ml-auto flex items-center gap-3 sm:order-3">
+          <UserBadge />
+          <Seal size={36} />
+        </div>
       </div>
+      <Ribbons variant="header" className="-mx-4 mt-3 w-[calc(100%+2rem)]" />
     </header>
   );
 }

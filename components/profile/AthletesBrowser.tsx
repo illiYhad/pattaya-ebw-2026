@@ -20,7 +20,7 @@ export function AthletesBrowser({ items, categories, initialCategory = "all" }: 
     }
     return true;
   });
-  const sel = "min-w-0 rounded bg-surface p-2 text-sm";
+  const sel = "min-w-0 rounded-full border border-[#E6DDEF] bg-surface px-4 py-2 text-sm";
 
   return (
     <div className="space-y-4">

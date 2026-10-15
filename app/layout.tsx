@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
+import { Kanit, Barlow_Condensed, Sarabun } from "next/font/google";
 import { EVENT } from "@/lib/event";
 import { data } from "@/lib/data";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import "./globals.css";
+
+const kanit = Kanit({ subsets: ["thai", "latin"], weight: ["300", "400", "500", "600", "700"], variable: "--font-kanit", display: "swap" });
+const barlow = Barlow_Condensed({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-barlow", display: "swap" });
+
+const sarabun = Sarabun({ subsets: ["thai", "latin"], weight: ["400", "500", "600"], variable: "--font-sarabun", display: "swap" });
 
 const description = `${EVENT.titleLine1} ${EVENT.titleLine2} · จัดโดย ${EVENT.organizer}`;
 
@@ -28,7 +34,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const css = themeStyle(config.theme);
   return (
     <html lang="th">
-      <body className="min-h-screen">
+      <body className={`${kanit.variable} ${barlow.variable} ${sarabun.variable} min-h-screen`}>
         {css && <style>{css}</style>}
         <SiteHeader logoSrc={config.logo_url || undefined} />
         <main className="mx-auto max-w-6xl p-4">{children}</main>
