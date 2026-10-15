@@ -88,7 +88,7 @@ export default async function Home() {
       </div>
 
       <LightShell pull={0} className="!pb-16 !pt-8">
-        <p className="text-xs text-muted">ข้อมูลอัปเดตทุก 20 วินาที · ผลคะแนนและอันดับจะแสดงเมื่อประกาศผลแล้ว</p>
+        <p className="text-xs text-muted">ข้อมูลอัปเดตทุก 20 วินาที · ผลคะแนนและอันดับจะแสดง<Phrases text="เมื่อประกาศผลแล้ว" /></p>
       </LightShell>
     </>
   );

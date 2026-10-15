@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { data } from "@/lib/data";
 import { AdminNav } from "@/components/admin/AdminNav";
-import { SESSION_LABEL, criteriaSummary, timeRangeOf } from "@/lib/view";
+import { criteriaSummary, sessionTimeLabel } from "@/lib/view";
 
 export const dynamic = "force-dynamic";
 
@@ -67,7 +67,7 @@ export default async function AdminPage() {
                       <Link href={`/admin/categories#${c.code}`} className="text-accent">{c.name}</Link>
                       <div className="text-xs text-muted">{c.name_en}</div>
                     </td>
-                    <td className="pr-2 text-muted">{SESSION_LABEL[c.session]} · {timeRangeOf(c)}</td>
+                    <td className="pr-2 text-muted">{sessionTimeLabel(c)}</td>
                     <td className="text-center">{es.length}</td>
                     <td className="text-center">{es.filter((e) => e.is_checked_in).length}</td>
                     <td className="pr-2 text-muted">

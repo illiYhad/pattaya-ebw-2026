@@ -6,7 +6,7 @@ import { Keep, Phrases } from "@/components/site/Keep";
 import { LightShell } from "@/components/site/LightShell";
 import { Ribbons } from "@/components/site/Ribbons";
 import { publicPhoto } from "@/lib/people";
-import { MEDIUM_LABEL, SESSION_LABEL, scoringLabel, timeRangeOf } from "@/lib/view";
+import { MEDIUM_LABEL, scoringLabel, sessionTimeLabel } from "@/lib/view";
 
 export const revalidate = 30;
 
@@ -76,7 +76,7 @@ export default async function AthletePage({ params }: { params: Promise<{ id: st
             <div key={entry.id} className="rounded-[28px] border border-[#E6DDEF] bg-white p-5">
               <div className="text-lg font-semibold"><Keep text={c.name} /></div>
               <div className="text-xs text-muted">{c.name_en}</div>
-              <div className="num mt-2 text-xl font-semibold text-accent">{SESSION_LABEL[c.session]} · <Phrases text={timeRangeOf(c)} /></div>
+              <div className="num mt-2 text-xl font-semibold text-accent"><Phrases text={sessionTimeLabel(c)} /></div>
               <div className="mt-1 flex flex-wrap gap-x-3 text-xs text-muted">
                 {c.medium && <span>{MEDIUM_LABEL[c.medium]}</span>}
                 <span>กรรมการ {c.judge_count} คน</span>
