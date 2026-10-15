@@ -5,9 +5,9 @@ import { EventMark } from "@/components/brand/Brand";
 const SIZES = { sm: "h-8 w-8 text-xs", md: "h-24 w-20 text-xl", lg: "h-48 w-40 text-4xl", xl: "h-80 w-64 text-6xl", fill: "h-full w-full text-5xl" };
 
 /** รูปตัดพื้นบนพื้นสีงาน (navy→blue + ลายน้ำนก) · ไม่มีรูป = เงา + อักษรย่อ · mark = นก 18–20px มุมขวาล่าง */
-export function Avatar({ src, name, size = "md", className = "", mark }: { src?: string; name: string; size?: keyof typeof SIZES; className?: string; mark?: number }) {
+export function Avatar({ src, name, size = "md", className = "", mark, round }: { src?: string; name: string; size?: keyof typeof SIZES; className?: string; mark?: number; round?: boolean }) {
   return (
-    <div className={`brand-bg relative flex shrink-0 items-end justify-center overflow-hidden rounded-lg ${SIZES[size]} ${className}`} aria-label={name}>
+    <div className={`brand-bg relative flex shrink-0 items-end justify-center overflow-hidden ${round ? "rounded-full border-[5px] border-gold" : "rounded-lg"} ${SIZES[size]} ${className}`} aria-label={name}>
       {size !== "sm" && (
         <div className="pointer-events-none absolute -right-[10%] -top-[10%] opacity-10" aria-hidden>
           <EventMark variant="white" size={size === "fill" || size === "xl" ? 260 : 120} />
