@@ -31,9 +31,9 @@ type Props = {
 };
 
 /** แถบโค้งทอง/ชมพู/เส้นงาช้างด้านล่างจอ (ตาม 2_LiveScore) — พื้นโปร่ง */
-function LiveRibbons() {
+function LiveRibbons({ low = false }: { low?: boolean }) {
   return (
-    <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true" className="pointer-events-none absolute left-0 top-0">
+    <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true" className="pointer-events-none absolute left-0 top-0" style={low ? { transform: "translateY(150px)" } : undefined}>
       <path d="M -100 1120 C 300 820, 900 1010, 2020 700" stroke="var(--gold)" strokeWidth="54" fill="none" />
       <path d="M -100 1190 C 360 900, 960 1080, 2020 790" stroke="var(--pink)" strokeWidth="26" fill="none" />
       <path d="M -100 1236 C 400 960, 1000 1130, 2020 850" stroke="var(--ivory)" strokeWidth="3" fill="none" opacity="0.6" />
@@ -128,8 +128,7 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
       {scene === "STARTING" && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-8 overflow-hidden bg-bg/95">
           <Watermark height={820} />
-          <LiveRibbons />
-          <LiveBadge />
+          <LiveRibbons low />
           <OfficialHeader showLogo={false} />
           <EventLogo variant="white" width={480} priority />
           <div className="relative text-5xl font-black">เริ่มเร็ว ๆ นี้</div>
@@ -149,6 +148,7 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
       {scene === "LIVE" && (
         <>
           <LiveRibbons />
+          <LiveBadge />
           <LowerThird competitor={competitor} category={category} show={lowerThird} photo={photo} />
           {bug !== "hidden" && <OfficialBug size="sm" className="absolute" style={bugFixed} />}
         </>
@@ -157,7 +157,7 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
       {scene === "BREAK" && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-8 overflow-hidden bg-bg/95">
           <Watermark height={820} />
-          <LiveRibbons />
+          <LiveRibbons low />
           <OfficialHeader showLogo={false} />
           <EventLogo variant="white" width={640} priority />
           <div className="relative text-8xl font-black">พักการแข่งขัน</div>
@@ -168,7 +168,7 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
       {scene === "RESULT" && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 overflow-hidden bg-bg/95">
           <Watermark height={820} />
-          <LiveRibbons />
+          <LiveRibbons low />
           <OfficialHeader />
           <div className="relative text-4xl text-accent">{category.name}</div>
           <div className="relative text-6xl font-black">{competitor.name_th}</div>
@@ -183,7 +183,7 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
       {scene === "SPONSOR" && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-10 overflow-hidden bg-bg/95">
           <Watermark height={820} />
-          <LiveRibbons />
+          <LiveRibbons low />
           <LiveBadge />
           {fullScreenSponsors.length === 0 ? (
             <>

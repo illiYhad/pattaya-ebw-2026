@@ -9,8 +9,7 @@ import { Ribbons } from "./Ribbons";
 export function SiteHeader({ logoSrc }: { logoSrc?: string }) {
   void logoSrc;
   return (
-    <header className="site-header relative z-10 overflow-hidden bg-bg px-4 pb-5 pt-3 text-ivory">
-      <Ribbons variant="header" />
+    <header className="site-header relative z-10 overflow-hidden bg-bg px-4 pt-3 text-ivory">
       <div className="relative mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2">
         <Link href="/" className="num text-[22px] font-bold tracking-[0.22em]" aria-label={EVENT.shortTitle}>EBW 2026</Link>
         <nav className="flex flex-wrap gap-x-1 gap-y-1 text-base">
@@ -29,6 +28,7 @@ export function SiteHeader({ logoSrc }: { logoSrc?: string }) {
           <Seal size={36} />
         </div>
       </div>
+      <Ribbons variant="header" className="-mx-4 mt-3 w-[calc(100%+2rem)]" />
     </header>
   );
 }

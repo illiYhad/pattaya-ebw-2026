@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { data } from "@/lib/data";
 import { EVENT, SCHEDULE } from "@/lib/event";
-import { Seal } from "@/components/brand/Brand";
 import { LightShell } from "@/components/site/LightShell";
 import { Ribbons } from "@/components/site/Ribbons";
 import { mockBlocked } from "@/lib/auth";
@@ -28,10 +27,9 @@ export default async function Home() {
     <>
       <div className="relative left-1/2 -mt-4 w-screen -translate-x-1/2 bg-[#FBF7F2]">
       <section className="hero relative overflow-hidden rounded-b-[50%_80px] bg-bg text-ivory">
-        <Ribbons variant="hero" />
-        <div className="relative mx-auto flex max-w-6xl flex-col gap-3.5 px-6 pb-36 pt-12 sm:pt-16">
+        <div className="relative mx-auto flex max-w-6xl flex-col gap-3.5 px-6 pb-9 pt-12 sm:pt-16">
           <div className="num text-lg font-semibold tracking-[0.34em] text-pink sm:text-xl">PMAT PRESENTS</div>
-          <h1 className="num max-w-[820px] text-5xl font-bold leading-[0.92] sm:text-[5.2rem]">{EVENT.titleLine2}</h1>
+          <h1 className="num max-w-[820px] text-[clamp(2.6rem,9vw,5.2rem)] font-bold leading-[0.92]">{EVENT.titleLine2}</h1>
           <div className="max-w-[720px] text-lg font-light text-[#E9E3FF] sm:text-[1.35rem]">{EVENT.titleLine1}</div>
           <div className="mt-1.5 flex flex-wrap gap-2.5 text-base">
             <span className="rounded-full bg-ivory/10 px-4 py-2">{thaiDate(day)}</span>
@@ -42,9 +40,9 @@ export default async function Home() {
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <Link href="/athletes" className="rounded-full bg-gold px-8 py-3.5 text-lg font-semibold text-bg">รายชื่อผู้แข่งขัน</Link>
             {!mockBlocked && <Link href="/checkin" className="rounded-full border-2 border-ivory px-7 py-3 text-lg font-medium text-ivory">เช็กอินหน้างาน</Link>}
-            <Seal size={64} className="ml-auto hidden sm:block" priority />
           </div>
         </div>
+        <Ribbons variant="hero" />
       </section>
       </div>
 

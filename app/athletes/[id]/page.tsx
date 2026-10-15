@@ -26,8 +26,7 @@ export default async function AthletePage({ params }: { params: Promise<{ id: st
   return (
     <>
       <div className="relative left-1/2 -mt-4 w-screen -translate-x-1/2 bg-[#FBF7F2]">
-      <section className="hero relative overflow-hidden rounded-b-[50%_64px] bg-bg pb-24 text-ivory">
-        <Ribbons variant="profile" />
+      <section className="hero relative overflow-hidden rounded-b-[50%_64px] bg-bg pb-14 text-ivory">
         <div className="relative mx-auto max-w-6xl px-5 pt-3">
           <Link href="/athletes" className="inline-flex min-h-11 items-center gap-1.5 text-[15px]">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
@@ -40,11 +39,12 @@ export default async function AthletePage({ params }: { params: Promise<{ id: st
             {me.shop && <div className="text-sm text-[#C9C3E6]">ร้าน/สังกัด: {me.shop}</div>}
           </div>
         </div>
+        <Ribbons variant="profile" className="mt-5" />
       </section>
       </div>
 
       <LightShell pull={0} className="space-y-8 pb-12 !pt-0">
-        <div className="relative z-20 -mt-20 flex justify-center">
+        <div className="relative z-20 -mt-10 flex justify-center pb-4">
           <Avatar src={photo?.cutout_url} name={me.name_th} size="lg" round className="!h-40 !w-40 !text-4xl shadow-[0_10px_30px_rgba(18,15,46,0.3)] sm:!h-48 sm:!w-48" />
         </div>
         <div className="flex flex-wrap justify-center gap-2">
