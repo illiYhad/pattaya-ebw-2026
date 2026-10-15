@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { data } from "@/lib/data";
-import { EVENT, SCHEDULE } from "@/lib/event";
+import { EVENT } from "@/lib/event";
 import { Phrases, Keep } from "@/components/site/Keep";
 import { LightShell } from "@/components/site/LightShell";
+import { PosterSchedule } from "@/components/site/PosterSchedule";
 import { Ribbons } from "@/components/site/Ribbons";
 import { mockBlocked } from "@/lib/auth";
 import { MEDIUM_LABEL, SESSION_LABEL, SESSION_ORDER, thaiDate, timeRangeOf } from "@/lib/view";
@@ -47,7 +48,7 @@ export default async function Home() {
       </section>
       </div>
 
-      <LightShell pull={0} className="pb-12 pt-16">
+      <LightShell pull={0} className="pb-16 pt-16">
         <div className="space-y-16">
         <section className="space-y-6">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -79,20 +80,13 @@ export default async function Home() {
           })}
         </section>
 
-        <section className="space-y-6">
-          <h2 className="text-[2rem] font-semibold">กำหนดการ · <span className="whitespace-nowrap">{thaiDate(day)}</span></h2>
-          <div className="flex flex-col overflow-hidden rounded-[28px] border border-[#E6DDEF] bg-white">
-            {SCHEDULE.map((s) => (
-              <div key={s.time + s.label} className="flex flex-wrap items-baseline gap-x-6 gap-y-1 border-t border-[#F0EAF5] px-6 py-4 first:border-t-0">
-                <div className="num w-[150px] shrink-0 text-[22px] font-semibold text-accent">{s.time}</div>
-                <div className="min-w-[200px] flex-1 text-lg">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </section>
         <p className="text-xs text-muted">ข้อมูลอัปเดตทุก 20 วินาที · ผลคะแนนและอันดับจะแสดงเมื่อประกาศผลแล้ว</p>
         </div>
       </LightShell>
+
+      <div className="relative left-1/2 -mb-4 w-screen -translate-x-1/2">
+        <PosterSchedule day={day} />
+      </div>
     </>
   );
 }

@@ -36,3 +36,9 @@ export function thaiDate(ymd: string): string {
 /** สปอนเซอร์ที่เปิดใช้ในตำแหน่งนั้น เรียงตาม sequence */
 export const sponsorsAt = (sponsors: Sponsor[], position: SponsorPosition) =>
   sponsors.filter((s) => s.is_active && s.position === position).sort((a, b) => a.sequence - b.sequence);
+
+/** มุมเข็มนาฬิกาจากเวลาเริ่ม "HH:MM" · เข็มชั่วโมง = ((ชม. mod 12) + นาที/60) × 30° · เข็มนาที = นาที × 6° */
+export function handAngles(start: string): { hour: number; minute: number } {
+  const [h, m] = start.split(":").map(Number);
+  return { hour: (((h % 12) + m / 60) * 30) % 360, minute: m * 6 };
+}
