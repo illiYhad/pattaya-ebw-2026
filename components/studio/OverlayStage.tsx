@@ -161,7 +161,6 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
           <OfficialHeader showLogo={false} />
           <EventLogo variant="white" width={640} priority />
           <div className="relative text-8xl font-black">พักการแข่งขัน</div>
-          <div className="relative flex items-center gap-4 text-3xl text-muted"><Seal size={110} /><span>จัดโดย {BRAND.organizer}</span></div>
         </div>
       )}
 

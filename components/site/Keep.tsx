@@ -14,7 +14,8 @@ export function Keep({ text }: { text: string }) {
 
 /** แต่ละวลี (แยกด้วยช่องว่าง) เป็นก้อนเดียว ไม่ขาดกลางคำ */
 export function Phrases({ text }: { text: string }) {
-  const words = text.split(" ").filter(Boolean);
+  // ช่องว่างในวงเล็บเป็น NBSP กัน "(90 | นาที)" ขาด
+  const words = text.replace(/\([^)]*\)/g, (m) => m.replace(/ /g, " ")).split(" ").filter(Boolean);
   return (
     <>
       {words.map((w, i) => (

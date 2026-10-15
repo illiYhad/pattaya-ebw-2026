@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import type { Category, Criterion, Medium, Session } from "@/lib/types";
-import { MEDIUM_LABEL, SESSION_LABEL, SESSION_ORDER, criteriaSummary, timeRangeOf } from "@/lib/view";
+import { MEDIUM_LABEL, SESSION_LABEL, SESSION_ORDER, criteriaSummary, sessionTimeLabel } from "@/lib/view";
 import { btn } from "@/components/ui/ConfirmButton";
 import { MsgLine, useAct } from "@/components/ui/useAct";
 import { saveCategoryAction } from "@/app/admin/categories/actions";
@@ -75,7 +75,7 @@ function CategoryCard({ c, count }: { c: Category; count: number }) {
         <div className="min-w-0 flex-1">
           <h2 className="text-lg font-bold">{c.name} <span className="text-sm font-normal text-muted">{c.name_en}</span></h2>
           <div className="text-sm text-muted">
-            {SESSION_LABEL[c.session]} · {timeRangeOf(c)} · {c.medium ? MEDIUM_LABEL[c.medium] : "ไม่ระบุสิ่งที่ใช้แข่ง"} · ผู้แข่ง {count} คน · กรรมการ {c.judge_count} คน ·{" "}
+            {sessionTimeLabel(c)} · {c.medium ? MEDIUM_LABEL[c.medium] : "ไม่ระบุสิ่งที่ใช้แข่ง"} · ผู้แข่ง {count} คน · กรรมการ {c.judge_count} คน ·{" "}
             เกณฑ์ {c.criteria.length ? `${c.criteria.length} ข้อ รวม ${live.total}${live.blank ? ` (ว่าง ${live.blank})` : ""}` : "ยังไม่มี"}
           </div>
           {c.pending_notes.length > 0 && (

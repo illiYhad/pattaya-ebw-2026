@@ -12,8 +12,11 @@ export function SiteHeader({ logoSrc }: { logoSrc?: string }) {
     <header className="site-header relative z-10 overflow-hidden bg-bg px-4 pt-3 text-ivory">
       <div className="relative mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2">
         <Link href="/" className="num order-1 text-[22px] font-bold tracking-[0.22em]" aria-label={EVENT.shortTitle}>EBW 2026</Link>
-        <nav className="no-scrollbar order-3 -mx-4 flex w-[calc(100%+2rem)] flex-nowrap overflow-x-auto px-4 text-base whitespace-nowrap sm:order-2 sm:mx-0 sm:w-auto sm:px-0">
+        <nav className="no-scrollbar order-3 -mx-4 flex w-[calc(100%+2rem)] flex-nowrap overflow-x-auto px-4 text-base whitespace-nowrap lg:order-2 lg:mx-0 lg:w-auto lg:px-0">
           <Link href="/" className="flex min-h-11 items-center px-3">หน้าแรก</Link>
+          <Link href="/categories" className="flex min-h-11 items-center px-3">ประเภท/กติกา</Link>
+          <Link href="/register" className="flex min-h-11 items-center px-3">สมัครแข่งขัน</Link>
+          <Link href="/info" className="flex min-h-11 items-center px-3">ข้อมูลงาน</Link>
           <Link href="/athletes" className="flex min-h-11 items-center px-3">ผู้แข่งขัน</Link>
           {!mockBlocked && (
             <>
@@ -23,7 +26,7 @@ export function SiteHeader({ logoSrc }: { logoSrc?: string }) {
             </>
           )}
         </nav>
-        <div className="order-2 ml-auto flex items-center gap-3 sm:order-3">
+        <div className="order-2 ml-auto flex items-center gap-3 lg:order-3">
           <UserBadge />
           <Seal size={36} />
         </div>
