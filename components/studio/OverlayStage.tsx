@@ -14,8 +14,8 @@ import { Stinger } from "./Stinger";
 const BAR_ROTATE_MS = 8000;
 const TONE: Record<HudTone, string> = { info: "bg-accent text-black", warn: "bg-amber-400 text-black", alert: "bg-live text-white" };
 const SPONSOR_H = 44;
-const BUG_MARGIN = 18;
-const LT_LEFT = 72;
+const BUG_MARGIN = 64;
+const LT_LEFT = 64;
 const LT_BOTTOM = 120;
 
 type Props = {
@@ -44,7 +44,7 @@ function LiveRibbons({ low = false }: { low?: boolean }) {
 /** ป้าย "EBW 2026 · LIVE" มุมซ้ายบน */
 function LiveBadge() {
   return (
-    <div className="absolute left-[72px] top-14 z-20 flex items-center gap-3.5 rounded-full bg-bg py-2.5 pl-[18px] pr-7">
+    <div className="absolute left-16 top-16 z-20 flex items-center gap-3.5 rounded-full bg-bg py-2.5 pl-[18px] pr-7">
       <div className="h-4 w-4 rounded-full" style={{ background: "var(--pink)" }} />
       <div className="num text-[30px] font-bold tracking-[0.2em]">EBW 2026 · LIVE</div>
     </div>
@@ -119,9 +119,9 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
   const sponsorH = sponsorBarShown ? SPONSOR_H : 0;
   const bugBottom = sponsorH + BUG_MARGIN;
   const bugStyle: React.CSSProperties =
-    bug === "tl" ? { left: 32, top: 32 } : bug === "tr" ? { right: 32, top: 32 } : bug === "bl" ? { left: 32, bottom: bugBottom } : { right: 32, bottom: bugBottom };
+    bug === "tl" ? { left: 64, top: 64 } : bug === "tr" ? { right: 64, top: 64 } : bug === "bl" ? { left: 64, bottom: bugBottom } : { right: 64, bottom: bugBottom };
   // ป้ายชื่ออยู่ซ้ายล่าง → ถ้าตราอยู่ซ้ายล่างด้วย ย้ายตราไปขวาล่างอัตโนมัติ
-  const bugFixed: React.CSSProperties = bug === "bl" && lowerThird ? { right: 32, bottom: bugBottom } : bugStyle;
+  const bugFixed: React.CSSProperties = bug === "bl" && lowerThird ? { right: 64, bottom: bugBottom } : bugStyle;
 
   return (
     <div className="relative h-[1080px] w-[1920px] overflow-hidden text-text" style={{ background: "transparent" }}>
@@ -196,14 +196,14 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
               {fullScreenSponsors.map((s) => (
                 <div key={s.id} className="relative"><SponsorLogo sponsor={s} className={s.level === "main" ? "h-40" : "h-24"} /></div>
               ))}
-              <div className="absolute bottom-12 left-1/2 flex -translate-x-1/2 items-center gap-6"><EventLogo variant="white" width={260} /><Seal size={96} /></div>
+              <div className="absolute bottom-16 left-1/2 flex -translate-x-1/2 items-center gap-6"><EventLogo variant="white" width={260} /><Seal size={96} /></div>
             </>
           )}
         </div>
       )}
 
       {scene !== "SPONSOR" && corner && (
-        <div className={`absolute rounded-lg bg-bg/80 px-4 py-2 text-2xl ${fullScreen ? "bottom-10 right-10" : bug === "tr" ? "left-10 top-10" : "right-10 top-10"}`}>
+        <div className={`absolute rounded-lg bg-bg/80 px-4 py-2 text-2xl ${fullScreen ? "bottom-16 right-16" : bug === "tr" ? "left-16 top-16" : "right-16 top-16"}`}>
           <SponsorLogo sponsor={corner} />
         </div>
       )}
@@ -215,7 +215,7 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
       )}
 
       {hud && (
-        <div className={`absolute inset-x-0 z-30 mx-auto w-fit rounded-xl px-12 py-4 text-5xl font-black shadow-2xl ${TONE[hud.tone]}`} style={{ top: 48 }}>
+        <div className={`absolute inset-x-0 z-30 mx-auto w-fit rounded-xl px-12 py-4 text-5xl font-black shadow-2xl ${TONE[hud.tone]}`} style={{ top: 64 }}>
           {hud.text}
         </div>
       )}

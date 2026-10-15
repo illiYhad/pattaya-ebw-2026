@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { data } from "@/lib/data";
 import { EVENT, SCHEDULE } from "@/lib/event";
+import { Phrases, Keep } from "@/components/site/Keep";
 import { LightShell } from "@/components/site/LightShell";
 import { Ribbons } from "@/components/site/Ribbons";
 import { mockBlocked } from "@/lib/auth";
@@ -30,7 +31,7 @@ export default async function Home() {
         <div className="relative mx-auto flex max-w-6xl flex-col gap-3.5 px-6 pb-9 pt-12 sm:pt-16">
           <div className="num text-lg font-semibold tracking-[0.34em] text-pink sm:text-xl">PMAT PRESENTS</div>
           <h1 className="num max-w-[820px] text-[clamp(2.6rem,9vw,5.2rem)] font-bold leading-[0.92]">{EVENT.titleLine2}</h1>
-          <div className="max-w-[720px] text-lg font-light text-[#E9E3FF] sm:text-[1.35rem]">{EVENT.titleLine1}</div>
+          <div className="max-w-[720px] text-lg font-light text-[#E9E3FF] sm:text-[1.35rem]"><Phrases text={EVENT.titleLine1} /></div>
           <div className="mt-1.5 flex flex-wrap gap-2.5 text-base">
             <span className="rounded-full bg-ivory/10 px-4 py-2">{thaiDate(day)}</span>
             <span className="rounded-full bg-ivory/10 px-4 py-2">{EVENT.venue}</span>
@@ -46,8 +47,9 @@ export default async function Home() {
       </section>
       </div>
 
-      <LightShell pull={0} className="space-y-14 pb-12 pt-14">
-        <section className="space-y-5">
+      <LightShell pull={0} className="pb-12 pt-16">
+        <div className="space-y-16">
+        <section className="space-y-6">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="text-[2rem] font-semibold">ประเภทการแข่งขัน</h2>
             <div className="text-base text-muted">{inField} ประเภทในสนาม{submit > 0 ? ` · ${submit} ประเภทส่งผลงาน` : ""}</div>
@@ -63,7 +65,7 @@ export default async function Home() {
                       <span className={`rounded-full px-3.5 py-1 text-sm font-medium ${CHIP[s]}`}>{SESSION_LABEL[s]}</span>
                       <span className="num text-lg font-semibold text-muted">ผู้แข่ง {countOf(c.id)} คน</span>
                     </div>
-                    <div className="text-xl font-semibold leading-snug">{c.name}</div>
+                    <div className="text-xl font-semibold leading-snug"><Keep text={c.name} /></div>
                     <div className="text-xs text-muted">{c.name_en}</div>
                     <div className="num text-[1.4rem] font-semibold text-accent">{timeRangeOf(c)}</div>
                     <div className="flex flex-wrap gap-x-3 text-xs text-muted">
@@ -77,8 +79,8 @@ export default async function Home() {
           })}
         </section>
 
-        <section className="space-y-5">
-          <h2 className="text-[2rem] font-semibold">กำหนดการ · {thaiDate(day)}</h2>
+        <section className="space-y-6">
+          <h2 className="text-[2rem] font-semibold">กำหนดการ · <span className="whitespace-nowrap">{thaiDate(day)}</span></h2>
           <div className="flex flex-col overflow-hidden rounded-[28px] border border-[#E6DDEF] bg-white">
             {SCHEDULE.map((s) => (
               <div key={s.time + s.label} className="flex flex-wrap items-baseline gap-x-6 gap-y-1 border-t border-[#F0EAF5] px-6 py-4 first:border-t-0">
@@ -89,6 +91,7 @@ export default async function Home() {
           </div>
         </section>
         <p className="text-xs text-muted">ข้อมูลอัปเดตทุก 20 วินาที · ผลคะแนนและอันดับจะแสดงเมื่อประกาศผลแล้ว</p>
+        </div>
       </LightShell>
     </>
   );

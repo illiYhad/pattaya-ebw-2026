@@ -58,7 +58,12 @@ body {
   color: var(--text);
   font-family: var(--font-th);
   overflow-x: clip;
+  line-height: 1.6;
 }
+
+/* เมนูมือถือเลื่อนแนวนอนได้ ซ่อนแถบเลื่อน */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
 .num { font-family: var(--font-num); }
 
 /* หัวเว็บ: ขอบล่างโค้ง · หน้าแรกมี hero ของตัวเองต่อท้าย → ไม่โค้งซ้ำ */

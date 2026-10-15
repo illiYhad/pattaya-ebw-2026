@@ -11,19 +11,19 @@ export function SiteHeader({ logoSrc }: { logoSrc?: string }) {
   return (
     <header className="site-header relative z-10 overflow-hidden bg-bg px-4 pt-3 text-ivory">
       <div className="relative mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2">
-        <Link href="/" className="num text-[22px] font-bold tracking-[0.22em]" aria-label={EVENT.shortTitle}>EBW 2026</Link>
-        <nav className="flex flex-wrap gap-x-1 gap-y-1 text-base">
-          <Link href="/" className="px-3 py-2">หน้าแรก</Link>
-          <Link href="/athletes" className="px-3 py-2">ผู้แข่งขัน</Link>
+        <Link href="/" className="num order-1 text-[22px] font-bold tracking-[0.22em]" aria-label={EVENT.shortTitle}>EBW 2026</Link>
+        <nav className="no-scrollbar order-3 -mx-4 flex w-[calc(100%+2rem)] flex-nowrap overflow-x-auto px-4 text-base whitespace-nowrap sm:order-2 sm:mx-0 sm:w-auto sm:px-0">
+          <Link href="/" className="flex min-h-11 items-center px-3">หน้าแรก</Link>
+          <Link href="/athletes" className="flex min-h-11 items-center px-3">ผู้แข่งขัน</Link>
           {!mockBlocked && (
             <>
-              <Link href="/checkin" className="px-3 py-2 text-muted">เช็กอิน</Link>
-              <Link href="/admin" className="px-3 py-2 text-muted">แอดมิน</Link>
-              <Link href="/stream-hub" className="px-3 py-2 text-muted">ห้องคุม</Link>
+              <Link href="/checkin" className="flex min-h-11 items-center px-3 text-muted">เช็กอิน</Link>
+              <Link href="/admin" className="flex min-h-11 items-center px-3 text-muted">แอดมิน</Link>
+              <Link href="/stream-hub" className="flex min-h-11 items-center px-3 text-muted">ห้องคุม</Link>
             </>
           )}
         </nav>
-        <div className="ml-auto flex items-center gap-3">
+        <div className="order-2 ml-auto flex items-center gap-3 sm:order-3">
           <UserBadge />
           <Seal size={36} />
         </div>

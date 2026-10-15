@@ -83,7 +83,7 @@ export function OfficialBug({ size = "sm", className = "", style }: { size?: "sm
 /** แถบบนของฉากเต็มจอ (overlay): ซ้าย = ตรา 96 + "จัดโดย / สมาคม PMAT" · ขวา = โลโก้งาน (ซ่อนได้เมื่อมีโลโก้ในฉากแล้ว) */
 export function OfficialHeader({ showLogo = true }: { showLogo?: boolean }) {
   return (
-    <div className="pointer-events-none absolute inset-x-16 top-12 z-20 flex items-start justify-between">
+    <div className="pointer-events-none absolute inset-x-16 top-16 z-20 flex items-start justify-between">
       <div className="flex items-center gap-4">
         <Seal size={96} />
         <div className="leading-tight">
