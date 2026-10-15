@@ -53,6 +53,9 @@
   --color-ivory: var(--ivory);
 }
 
+/* กันเลื่อนแนวนอนจากกล่องเต็มจอ (w-screen) เมื่อเบราว์เซอร์มีแถบเลื่อนแนวตั้ง · clip ไม่สร้าง scroll container */
+html { overflow-x: clip; }
+
 body {
   background: var(--bg);
   color: var(--text);

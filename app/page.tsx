@@ -2,6 +2,7 @@ import Link from "next/link";
 import { data } from "@/lib/data";
 import { EVENT } from "@/lib/event";
 import { Phrases, Keep } from "@/components/site/Keep";
+import { PosterText } from "@/components/site/PosterText";
 import { LightShell } from "@/components/site/LightShell";
 import { PosterSchedule } from "@/components/site/PosterSchedule";
 import { Ribbons } from "@/components/site/Ribbons";
@@ -11,6 +12,13 @@ import type { Session } from "@/lib/types";
 
 // หน้าสาธารณะ: ไม่ subscribe Realtime — ใช้ revalidate แทน
 export const revalidate = 20;
+
+/** ลิงก์ด่วนใต้ hero (K-P1.10 · ตาม 7_Artwork_Pages/index.html) */
+const QUICK_LINKS = [
+  { href: "/categories", ico: "/artwork/facial-c3.png", title: "ประเภทและกติกา", desc: "เวลาแข่งขัน เกณฑ์คะแนน สิ่งที่ต้องเตรียม ครบ 7 ประเภท" },
+  { href: "/register", ico: "/artwork/ben-certificate.png", title: "สมัครแข่งขัน", desc: "ประเภทละ 1,800 บาท · 2 ประเภท 3,300 บาท · ช่องทางโอนเงิน" },
+  { href: "/info", ico: "/artwork/ben-group.png", title: "ข้อมูลงาน", desc: "วัน สถานที่ หมวดการแข่งขัน และ Dress code" },
+] as const;
 
 const CHIP: Record<Session, string> = {
   morning: "bg-[#FBEFD9] text-[#6A4B12]",
@@ -50,6 +58,18 @@ export default async function Home() {
 
       <LightShell pull={0} className="pb-16 pt-16">
         <div className="space-y-16">
+        <section className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-3.5" aria-label="ลิงก์ด่วน">
+          {QUICK_LINKS.map((q) => (
+            <Link key={q.href} href={q.href} className="grid grid-cols-[64px_1fr] items-center gap-3.5 rounded-[24px] border border-[#E6DDEF] bg-white px-[18px] py-3.5 text-[#1B1638] shadow-[0_1px_0_#fff]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={q.ico} width={120} height={120} alt="" className="h-16 w-16" />
+              <span>
+                <b className="block text-[19px] font-semibold">{q.title}</b>
+                <small className="block text-sm leading-[1.45] text-[#5A527F]"><PosterText text={q.desc} /></small>
+              </span>
+            </Link>
+          ))}
+        </section>
         <section className="space-y-6">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="text-[2rem] font-semibold">ประเภทการแข่งขัน</h2>
@@ -83,7 +103,7 @@ export default async function Home() {
         </div>
       </LightShell>
 
-      <div className="relative left-1/2 w-screen -translate-x-1/2 bg-[#FBF7F2]">
+      <div id="schedule" className="relative left-1/2 w-screen -translate-x-1/2 bg-[#FBF7F2]">
         <PosterSchedule day={day} />
       </div>
 
