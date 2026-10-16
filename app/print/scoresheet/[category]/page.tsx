@@ -48,7 +48,7 @@ export default async function ScoresheetPage({ params }: { params: Promise<{ cat
   return (
     <div className="sheets">
       <style>{CSS}</style>
-      <div className="no-print mb-4 flex flex-wrap items-center gap-3 text-sm">
+      <div className="no-print mb-4 flex flex-wrap items-center gap-3 text-sm text-white">
         <PrintButton label="พิมพ์ใบคะแนน (A4)" />
         <span>{category.name} · กรรมการ {category.judge_count} คน = {category.judge_count} หน้า</span>
         <Link className="underline" href="/admin/score">กลับหน้ากรอกคะแนน</Link>
