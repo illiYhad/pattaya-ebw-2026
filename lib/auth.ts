@@ -43,6 +43,7 @@ export const PATH_ROLES: { prefix: string; roles: StaffRole[] }[] = [
   { prefix: "/admin/photos", roles: ["admin", "result_staff"] },
   { prefix: "/admin", roles: ["admin"] },
   { prefix: "/checkin", roles: ["admin", "result_staff"] },
+  { prefix: "/print/scoresheet", roles: ["admin", "result_staff"] },
   { prefix: "/stream-hub", roles: ["admin", "stream_operator"] },
 ];
 

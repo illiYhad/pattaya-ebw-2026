@@ -141,11 +141,11 @@ export function computeBoard(category: Category, entries: Entry[], sheets: Score
   };
 }
 
-/** ผลสำหรับคนทั่วไป: ยังไม่ประกาศ = { status: "pending" } เท่านั้น · ประกาศแล้วเห็นเฉพาะรายการที่จัดอันดับ ไม่มีคะแนนรายกรรมการ */
+/** ผลสำหรับคนทั่วไป: ยังไม่ประกาศ = { status: "pending" } เท่านั้น · ประกาศแล้วเห็นเฉพาะรายการที่จัดอันดับ (K-P2c: พร้อมคะแนนรายกรรมการ + เฉลี่ยรายเกณฑ์ · ไม่มีค่าตัดสินเสมอภายใน) */
 export function toPublicResults(board: ResultBoard): PublicResults {
   if (!board.published) return { status: "pending" };
   const standings = board.standings
     .filter((s) => s.status === "complete")
-    .map((s): Standing => ({ entry_id: s.entry_id, competitor_id: s.competitor_id, sheets_done: s.sheets_done, status: s.status, judge_totals: [], score: s.score, rank: s.rank, place: s.place, tie_unresolved: false }));
+    .map((s): Standing => ({ entry_id: s.entry_id, competitor_id: s.competitor_id, sheets_done: s.sheets_done, status: s.status, judge_totals: [...s.judge_totals], ...(s.criteria_avg ? { criteria_avg: [...s.criteria_avg] } : {}), score: s.score, rank: s.rank, place: s.place, tie_unresolved: false }));
   return { status: "published", standings };
 }

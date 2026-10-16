@@ -109,8 +109,8 @@ export type Sponsor = {
 
 export type StaffRole = "admin" | "result_staff" | "stream_operator";
 
-/** ฉากบน overlay (ไม่มี BRACKET แล้ว) */
-export type Scene = "STARTING" | "LIVE" | "BREAK" | "RESULT" | "SPONSOR";
+/** ฉากบน overlay (ไม่มี BRACKET แล้ว) · SCORE = คะแนนผู้แข่ง 1 คน (K-P2c) */
+export type Scene = "STARTING" | "LIVE" | "BREAK" | "RESULT" | "SCORE" | "SPONSOR";
 
 // ---------- ระบบคะแนนกรรมการ (ใบ K-P2a) ----------
 

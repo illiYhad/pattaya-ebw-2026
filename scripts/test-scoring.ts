@@ -167,7 +167,8 @@ test("S10", "pending ไม่มีตัวเลข / publish เห็นอ
   if (pub.status === "published") {
     assert.equal(pub.standings[0].rank, 1);
     assert.equal(pub.standings[0].entry_id, eid("A", "lip"));
-    assert.deepEqual(pub.standings[0].judge_totals, []);
+    assert.deepEqual(pub.standings[0].judge_totals, [80, 81, 82]); // K-P2c: ประกาศแล้วเห็นคะแนนรายกรรมการ
+    assert.equal(pub.standings[0].tie_unresolved, false);
   }
   throwsTh(() => w.e.saveScoreSheet(eid("A", "lip"), 1, { total: 90 }), /ประกาศผลแล้ว ต้องกดซ่อนผลก่อนแก้คะแนน/);
   throwsTh(() => w.e.clearScoreSheet(eid("A", "lip"), 1), /ประกาศผลแล้ว/);

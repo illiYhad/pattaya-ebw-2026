@@ -249,12 +249,15 @@
   .pp-row .du .pp-dur{min-height:38px;font-size:15px}
   .pp-row .du .pp-dur svg{width:30px;height:30px}
   .pp-row .go{display:block;width:26px;height:26px;color:var(--rose-500)}
-  .pp-facts{grid-template-columns:1fr 1fr 1fr}
   .pp-pillars{grid-template-columns:repeat(4,1fr)}
-  .pp-dress{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);align-items:center;gap:calc(var(--u)*30)}
   .pp-bank dl{grid-template-columns:auto 1fr;padding:8px 24px 6px}
   .pp-bank-hd{padding:16px 24px}
   .pp-card{padding:22px 24px}
+}
+/* /info: กล่อง วัน/สถานที่/ผู้จัด 3 คอลัมน์ และ Dress code 2 คอลัมน์ เฉพาะคอลัมน์กว้าง ≥ 880px (K-P2 ข้อ 1 · จอ 768 เรียงแถวเดียวไม่หักกลางคำ) */
+@container (min-width:880px){
+  .pp-facts{grid-template-columns:1fr 1fr 1fr}
+  .pp-dress{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);align-items:center;gap:calc(var(--u)*30)}
 }
 @media (min-width:700px){.pp{background:transparent;padding:72px 16px}.pp::before{-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 72px,#000 calc(100% - 72px),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 72px,#000 calc(100% - 72px),transparent 100%)}.pp-col{border-radius:12px;box-shadow:0 24px 64px rgba(0,0,0,.45)}}
 @media (prefers-reduced-motion:reduce){.pp-row{transition:none}.pp-row:hover{transform:none}}

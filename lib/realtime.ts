@@ -14,6 +14,8 @@ export const EVENTS = {
   brandBug: "brand_bug",
   /** ป้ายชื่อผู้แข่ง (lower third) บนฉาก LIVE */
   lowerThird: "lower_third",
+  /** ประเภท/รายการที่ฉาก RESULT และ SCORE ให้แสดง (K-P2c) */
+  resultFocus: "result_focus",
 } as const;
 
 export type HudTone = "info" | "warn" | "alert";
@@ -27,6 +29,8 @@ export type HubEventMap = {
   stinger_play: { then_scene?: Scene };
   brand_bug: { corner: BugCorner };
   lower_third: { show: boolean };
+  /** category_id = ประเภทของโพเดียม RESULT · entry_id (+ category_id) = ผู้แข่งของฉาก SCORE · ว่าง = ใช้ประเภท/รายการของ channel */
+  result_focus: { category_id?: string; entry_id?: string };
 };
 export type HubEventName = keyof HubEventMap;
 

@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 const TABS: { href: string; label: string }[] = [
   { href: "/admin", label: "ภาพรวม" },
   { href: "/admin/categories", label: "ประเภท / เกณฑ์" },
+  { href: "/admin/score", label: "กรอกคะแนน" },
+  { href: "/admin/results", label: "ผล / เปิดผล" },
   { href: "/admin/import", label: "นำเข้ารายชื่อ" },
   { href: "/admin/photos", label: "ถ่ายรูป" },
   { href: "/admin/sponsors", label: "สปอนเซอร์" },
