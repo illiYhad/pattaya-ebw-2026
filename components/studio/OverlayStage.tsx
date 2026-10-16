@@ -9,6 +9,7 @@ import { EVENT } from "@/lib/event";
 import { Avatar } from "@/components/profile/Avatar";
 import { BRAND, EventLogo, OfficialBug, OfficialHeader, Seal } from "@/components/brand/Brand";
 import { SponsorLogo } from "./SponsorLogo";
+import { ResultScene, ScoreScene, usePublicResults, type Directory } from "./ResultScenes";
 import { Stinger } from "./Stinger";
 import styles from "./LiveArtwork.module.css";
 
@@ -36,6 +37,8 @@ type Props = {
   inCategory: number;
   sponsors: Sponsor[];
   photos: AthletePhoto[];
+  /** ผู้แข่ง/รายการ/ประเภททั้งงาน — ให้ฉาก RESULT/SCORE เลือกแสดงรายการอื่นจากห้องคุมได้ (ข้อมูลสาธารณะ ไม่มีคะแนน) */
+  directory: Directory;
   stingerVideo?: string;
 };
 
@@ -104,11 +107,12 @@ function LowerThird({ competitor, category, show, photo }: { competitor: Competi
   );
 }
 
-export function OverlayStage({ channelKey, category, entry, competitor, inCategory, sponsors, photos, stingerVideo }: Props) {
+export function OverlayStage({ channelKey, category, entry, competitor, inCategory, sponsors, photos, directory, stingerVideo }: Props) {
   const [scene, setScene] = useState<Scene>("STARTING");
   const [hud, setHud] = useState<{ text: string; tone: HudTone } | null>(null);
   const [bug, setBug] = useState<BugCorner>("bl");
   const [lowerThird, setLowerThird] = useState(true);
+  const [focus, setFocus] = useState<HubEventMap["result_focus"]>({});
   const [stingerId, setStingerId] = useState(0);
   const pending = useRef<Scene | undefined>(undefined);
   const [barIdx, setBarIdx] = useState(0);
@@ -132,6 +136,7 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
           break;
         case EVENTS.brandBug: setBug((raw as HubEventMap["brand_bug"]).corner); break;
         case EVENTS.lowerThird: setLowerThird((raw as HubEventMap["lower_third"]).show); break;
+        case EVENTS.resultFocus: setFocus(raw as HubEventMap["result_focus"]); break;
       }
     });
     return () => { off(); bus.close(); };
@@ -142,6 +147,14 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
     const t = setInterval(() => setBarIdx((i) => i + 1), BAR_ROTATE_MS);
     return () => clearInterval(t);
   }, [bars.length]);
+
+  // ฉาก RESULT = โพเดียมของ focus.category_id (ค่าเริ่ม = ประเภทของ channel) · ฉาก SCORE = focus.entry_id (ค่าเริ่ม = รายการของ channel)
+  const scoreEntry = directory.entries.find((e) => e.id === (focus.entry_id ?? entry.id)) ?? entry;
+  const resultCategory = directory.categories.find((c) => c.id === (focus.category_id ?? category.id)) ?? category;
+  const scoreCategory = directory.categories.find((c) => c.id === scoreEntry.category_id) ?? category;
+  const resultsActive = scene === "RESULT" || scene === "SCORE";
+  const publicCategory = scene === "SCORE" ? scoreCategory : resultCategory;
+  const results = usePublicResults(publicCategory.code, resultsActive);
 
   const onCovered = useCallback(() => {
     if (pending.current) setScene(pending.current);
@@ -205,15 +218,16 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
       {scene === "RESULT" && (
         <div className={s("fs")}>
           <OfficialHeader />
-          <div className={s("col")} style={{ top: 190, width: 1140 }}>
-            <div className={`${s("card")} ${s("board")}`}>
-              <div className={s("chipDark")}>{category.name}</div>
-              <h1 className={s("boardName")}>{competitor.name_th}</h1>
-              <div className={s("boardEn")}>{competitor.name_en} · <span className="num">{competitor.code}</span></div>
-              <div className={`${s("pill")} ${s("result")} mt-2`}>รอประกาศผล</div>
-              <p className={s("note")}>ผลคะแนนและอันดับจะแสดงเมื่อประกาศผลแล้ว</p>
-            </div>
-          </div>
+          {results.status === "published" && <LiveRibbons />}
+          <ResultScene category={resultCategory} results={results} dir={directory} photos={photos} />
+        </div>
+      )}
+
+      {scene === "SCORE" && (
+        <div className={s("fs")}>
+          <OfficialHeader />
+          <LiveRibbons />
+          <ScoreScene category={scoreCategory} entry={scoreEntry} results={results} dir={directory} photos={photos} />
         </div>
       )}
 
