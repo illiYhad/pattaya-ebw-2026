@@ -70,3 +70,11 @@
 .boardName{margin:0;font-size:64px;font-weight:700;line-height:1.2;color:#1D4652}
 .boardEn{font-size:30px;color:#5B4A40}
 .result{font-size:120px}
+
+/* ---- ป้ายบนจอระหว่างไลฟ์ (K-P1.12 · สีอย่างเดียว ตำแหน่ง/ขนาดเดิม) ---- */
+.hud{border:2.5px solid #D9B39C;box-shadow:inset 0 0 0 4px rgba(13,53,64,.9),0 0 0 2px #9E7058,0 18px 44px rgba(0,0,0,.45)}
+.hudInfo{color:#FFF6EF;background:radial-gradient(120% 140% at 50% 0%,#2E6F7D 0,#174A57 45%,#0D3540 100%)}
+.hudWarn{color:#1D4652;background:linear-gradient(90deg,#E9DCD6,#EBDDD8 15%,#EBDCD7 85%,#E3D2CA);box-shadow:0 0 0 2px #9E7058,0 18px 44px rgba(0,0,0,.45)}
+.hudAlert{color:#FFF6EF;background:linear-gradient(180deg,#A27C66,#7A4E3C);text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.chipBox{color:#FFF6EF;background:rgba(13,53,64,.88);border:2px solid #D9B39C}
+.sponsorBar{color:#F1D9C8;background:rgba(13,53,64,.92);border-top:2px solid #C9A48F}

@@ -15,7 +15,8 @@ import styles from "./LiveArtwork.module.css";
 const s = (name: string) => styles[name] ?? name;
 
 const BAR_ROTATE_MS = 8000;
-const TONE: Record<HudTone, string> = { info: "bg-accent text-black", warn: "bg-amber-400 text-black", alert: "bg-live text-white" };
+/** สีป้ายแจ้งเตือนชุดโปสเตอร์ (K-P1.12): info เขียวหัวเป็ด · warn กระดาษครีม · alert โรสโกลด์เข้ม */
+const TONE: Record<HudTone, string> = { info: s("hudInfo"), warn: s("hudWarn"), alert: s("hudAlert") };
 const SPONSOR_H = 44;
 const BUG_MARGIN = 64;
 const LT_LEFT = 64;
@@ -161,7 +162,6 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
     <div className={`relative h-[1080px] w-[1920px] overflow-hidden ${s("stage")}`} style={{ background: "transparent" }}>
       {scene === "STARTING" && (
         <div className={s("fs")}>
-          <OfficialHeader showLogo={false} />
           <div className={s("col")} style={{ top: 150 }}>
             <PosterHead />
             <div className={s("plate")}>
@@ -192,7 +192,6 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
 
       {scene === "BREAK" && (
         <div className={s("fs")}>
-          <OfficialHeader showLogo={false} />
           <PosterBottom />
           <div className={s("col")} style={{ top: 170 }}>
             <PosterHead />
@@ -225,8 +224,7 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
           {fullScreenSponsors.length === 0 ? (
             <div className={s("col")} style={{ top: 150 }}>
               <PosterHead />
-              <div className={`${s("plate")} ${s("plateRow")}`}>
-                <Seal size={120} />
+              <div className={s("plate")}>
                 <span className={s("plateTitle")} style={{ fontSize: 48 }}>จัดโดย {BRAND.organizer}</span>
               </div>
             </div>
@@ -249,19 +247,19 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
       )}
 
       {scene !== "SPONSOR" && corner && (
-        <div className={`absolute rounded-lg bg-bg/80 px-4 py-2 text-2xl ${fullScreen ? "bottom-16 right-16" : bug === "tr" ? "left-16 top-16" : "right-16 top-16"}`}>
+        <div className={`absolute rounded-lg px-4 py-2 text-2xl ${s("chipBox")} ${fullScreen ? "bottom-16 right-16" : bug === "tr" ? "left-16 top-16" : "right-16 top-16"}`}>
           <SponsorLogo sponsor={corner} />
         </div>
       )}
       {sponsorBarShown && barSponsor && (
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-3 bg-bg/85 text-xl text-muted" style={{ height: SPONSOR_H }}>
+        <div className={`absolute inset-x-0 bottom-0 flex items-center justify-center gap-3 text-xl ${s("sponsorBar")}`} style={{ height: SPONSOR_H }}>
           <span className="text-base">สนับสนุนโดย</span>
           <SponsorLogo sponsor={barSponsor} className="h-7" />
         </div>
       )}
 
       {hud && (
-        <div className={`absolute inset-x-0 z-30 mx-auto w-fit rounded-xl px-12 py-4 text-5xl font-black shadow-2xl ${TONE[hud.tone]}`} style={{ top: 64 }}>
+        <div className={`absolute inset-x-0 z-30 mx-auto w-fit rounded-xl px-12 py-4 text-5xl font-black ${s("hud")} ${TONE[hud.tone]}`} style={{ top: 64 }}>
           {hud.text}
         </div>
       )}
