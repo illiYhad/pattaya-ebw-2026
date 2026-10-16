@@ -116,22 +116,24 @@ export function Stinger({
           {/* เส้นคลื่นฟ้า */}
           <div ref={line1Ref} className="absolute left-0 top-[52%] h-[14px] w-full" style={{ background: `linear-gradient(90deg, ${ST.rose}, ${ST.cream})`, opacity: 0 }} />
           <div ref={line2Ref} className="absolute left-0 top-[56%] h-[6px] w-full" style={{ background: `linear-gradient(90deg, ${ST.rose}, ${ST.cream})`, opacity: 0 }} />
-          {/* โลโก้ */}
-          <div ref={logoRef} className="absolute left-1/2 top-[44%] -translate-x-1/2 -translate-y-1/2" style={{ opacity: 0 }}>
-            <EventLogo variant="white" width={920} priority />
-          </div>
-          {/* ตรา + จัดโดย + สปอนเซอร์ */}
-          <div ref={creditRef} className="absolute inset-x-0 bottom-0 top-[70%] flex flex-col items-center justify-between pb-10" style={{ opacity: 0 }}>
-            <div className="flex items-center gap-5">
-              <Seal size={120} />
-              <div className="text-[28px] font-bold" style={{ color: ST.cream }}>จัดโดย {BRAND.organizer}</div>
+          {/* โลโก้ + แถวตราใต้ "2026" ชิดซ้ายแนวเดียวกับหัวข้อ (K-P1.12a · เว้น 40px) */}
+          <div className="absolute left-1/2 top-[44%] flex -translate-x-1/2 -translate-y-1/2 flex-col items-start gap-10">
+            <div ref={logoRef} style={{ opacity: 0 }}>
+              <EventLogo variant="white" width={920} priority />
             </div>
-            {sponsor && (
-              <div className="flex items-center gap-4 text-2xl" style={{ color: ST.blush }}>
-                <span>สนับสนุนโดย</span>
-                <SponsorLogo sponsor={sponsor} className="h-20" />
+            {/* ตรา + จัดโดย + สปอนเซอร์ */}
+            <div ref={creditRef} className="flex flex-col items-start gap-6" style={{ opacity: 0 }}>
+              <div className="flex items-center gap-5">
+                <Seal size={120} />
+                <div className="text-[28px] font-bold" style={{ color: ST.cream }}>จัดโดย {BRAND.organizer}</div>
               </div>
-            )}
+              {sponsor && (
+                <div className="flex items-center gap-4 text-2xl" style={{ color: ST.blush }}>
+                  <span>สนับสนุนโดย</span>
+                  <SponsorLogo sponsor={sponsor} className="h-20" />
+                </div>
+              )}
+            </div>
           </div>
         </>
       )}

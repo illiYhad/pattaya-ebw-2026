@@ -78,3 +78,6 @@
 .hudAlert{color:#FFF6EF;background:linear-gradient(180deg,#A27C66,#7A4E3C);text-shadow:0 2px 0 rgba(0,0,0,.3)}
 .chipBox{color:#FFF6EF;background:rgba(13,53,64,.88);border:2px solid #D9B39C}
 .sponsorBar{color:#F1D9C8;background:rgba(13,53,64,.92);border-top:2px solid #C9A48F}
+
+/* ---- รูปแทนผู้แข่ง (ไม่มีรูป) ครีม/โรสโกลด์บนเขียวหัวเป็ด (K-P1.12a · ทับสีม่วงของ Avatar เฉพาะกราฟิกไลฟ์) ---- */
+.avatar svg{color:#E8CBB8}
