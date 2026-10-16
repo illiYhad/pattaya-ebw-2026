@@ -10,7 +10,7 @@ import { clearScoreAction, saveScoreAction } from "@/app/admin/score/actions";
 export type EntryRow = { entryId: string; code: string; name: string; shop?: string };
 export type AuditRow = { id: string; at: string; by: string; entry: string; judge?: number; action: string; before?: string; after?: string };
 
-const inp = "w-full min-w-0 rounded bg-bg p-1.5 text-right text-sm tabular-nums disabled:opacity-50";
+const inp = "min-w-0 rounded bg-bg p-1.5 text-right text-sm tabular-nums disabled:opacity-50";
 
 /** ค่าที่กรอก (ข้อความ) ของใบเดียว: โหมดรายเกณฑ์ = 1 ช่องต่อข้อ · โหมดรวม = 1 ช่อง */
 const initial = (category: Category, sheet?: ScoreSheet): string[] => {
@@ -53,7 +53,7 @@ function ScoreCell({ category, row, judgeNo, sheet, locked }: { category: Catego
         <label key={i} className="flex items-center gap-1.5 text-xs">
           {criteriaMode && <span className="min-w-0 flex-1 truncate text-muted" title={category.criteria[i].name}>{category.criteria[i].name} <span className="whitespace-nowrap">/{category.criteria[i].max}</span></span>}
           <input
-            className={`${inp} ${criteriaMode ? "w-16 flex-none" : ""}`}
+            className={`${inp} ${criteriaMode ? "w-16 flex-none" : "w-full"}`}
             type="number" inputMode="decimal" step="0.1" min="0" max={criteriaMode ? category.criteria[i].max : max}
             value={v} disabled={locked || busy}
             aria-label={`${row.code} กรรมการ ${judgeNo}${criteriaMode ? ` ${category.criteria[i].name}` : " คะแนนรวม"}`}
