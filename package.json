@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev -p 3300",
     "build": "next build",
-    "start": "next start -p 3300"
+    "start": "next start -p 3300",
+    "test:scoring": "node --experimental-transform-types --import ./scripts/register-alias.mjs scripts/test-scoring.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",
