@@ -61,16 +61,17 @@ export interface DataSource {
 
   // คะแนนกรรมการ (ใบ K-P2a) — ผิดกติกา throw Error ข้อความไทย · getScoreSheets / getResultBoard / getScoreAudit ใช้ฝั่งแอดมินเท่านั้น
   getScoreSheets(categoryId: string): Promise<ScoreSheet[]>;
-  saveScoreSheet(entryId: string, judgeNo: number, input: ScoreInput): Promise<ScoreSheet>;
-  clearScoreSheet(entryId: string, judgeNo: number): Promise<void>;
-  setScoreMethod(categoryId: string, method: ScoreMethod): Promise<CategoryResultState>;
+  // actor = อีเมลผู้ทำรายการจริง (จาก requireRole) ลง audit / updated_by — ไม่ใส่ = ไม่ระบุ
+  saveScoreSheet(entryId: string, judgeNo: number, input: ScoreInput, actor?: string): Promise<ScoreSheet>;
+  clearScoreSheet(entryId: string, judgeNo: number, actor?: string): Promise<void>;
+  setScoreMethod(categoryId: string, method: ScoreMethod, actor?: string): Promise<CategoryResultState>;
   /** orderedEntryIds เรียงจากอันดับดีสุด ต้องครบทุกรายการในกลุ่มที่คะแนนเท่ากันพอดี */
-  setTieDecision(categoryId: string, orderedEntryIds: string[]): Promise<CategoryResultState>;
+  setTieDecision(categoryId: string, orderedEntryIds: string[], actor?: string): Promise<CategoryResultState>;
   getResultBoard(categoryId: string): Promise<ResultBoard>;
   /** ยังไม่ประกาศ = { status: "pending" } ไม่มีตัวเลขใด ๆ */
   getPublicResults(categoryId: string): Promise<PublicResults>;
-  publishResults(categoryId: string): Promise<CategoryResultState>;
-  hideResults(categoryId: string): Promise<CategoryResultState>;
+  publishResults(categoryId: string, actor?: string): Promise<CategoryResultState>;
+  hideResults(categoryId: string, actor?: string): Promise<CategoryResultState>;
   getScoreAudit(categoryId: string): Promise<ScoreAudit[]>;
 
   /** ฟังการเปลี่ยนของข้อมูล — mock: BroadcastChannel */

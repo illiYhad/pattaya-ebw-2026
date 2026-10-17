@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { data } from "@/lib/data";
 import { AdminNav } from "@/components/admin/AdminNav";
+import { getStaff } from "@/lib/auth";
 import { maxTotal } from "@/lib/data/scoring";
 
 export const dynamic = "force-dynamic";
@@ -9,6 +10,7 @@ export const dynamic = "force-dynamic";
 export default async function ScoreIndexPage() {
   const [categories, entries] = await Promise.all([data.getCategories(), data.getEntries()]);
   const boards = await Promise.all(categories.map((c) => data.getResultBoard(c.id)));
+  const isAdmin = (await getStaff())?.role === "admin"; // ลิงก์ "ผล / เปิดผล" เฉพาะแอดมิน (สตาฟกรอกผลเข้าไม่ได้)
   return (
     <div className="space-y-4">
       <AdminNav />
@@ -28,7 +30,7 @@ export default async function ScoreIndexPage() {
               <div className="text-xs text-muted">กรอกครบ {full}/{total} รายการ · กรรมการ {c.judge_count} คน · เต็ม {maxTotal(c)}</div>
               <div className="flex flex-wrap gap-2 text-sm">
                 <Link className="rounded bg-accent px-3 py-1.5 font-bold text-black" href={`/admin/score/${c.code}`}>กรอกคะแนน</Link>
-                <Link className="rounded bg-bg px-3 py-1.5" href="/admin/results">ผล / เปิดผล</Link>
+                {isAdmin && <Link className="rounded bg-bg px-3 py-1.5" href="/admin/results">ผล / เปิดผล</Link>}
                 <Link className="rounded bg-bg px-3 py-1.5" href={`/print/scoresheet/${c.code}`} target="_blank">พิมพ์ใบคะแนน</Link>
               </div>
             </li>

@@ -1,9 +1,8 @@
-"use client";
+import { getStaff } from "@/lib/auth";
+import { rolesForPath } from "@/lib/roles";
+import { AdminNavClient, type AdminTab } from "@/components/admin/AdminNavClient";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-
-const TABS: { href: string; label: string }[] = [
+const TABS: AdminTab[] = [
   { href: "/admin", label: "ภาพรวม" },
   { href: "/admin/categories", label: "ประเภท / เกณฑ์" },
   { href: "/admin/score", label: "กรอกคะแนน" },
@@ -15,18 +14,9 @@ const TABS: { href: string; label: string }[] = [
   { href: "/checkin", label: "เช็กอิน" },
 ];
 
-export function AdminNav() {
-  const path = usePathname();
-  return (
-    <nav className="no-print mb-4 flex flex-wrap gap-2 border-b border-white/10 pb-2 text-sm">
-      {TABS.map((t) => {
-        const active = t.href === "/admin" ? path === "/admin" : path.startsWith(t.href);
-        return (
-          <Link key={t.href} href={t.href} className={`rounded px-3 py-1 ${active ? "bg-accent text-black" : "bg-surface text-muted hover:text-text"}`}>
-            {t.label}
-          </Link>
-        );
-      })}
-    </nav>
-  );
+/** เมนูสตาฟ: แสดงเฉพาะแท็บที่บทบาทของผู้ใช้เข้าได้ (ใช้ตารางสิทธิ์เดียวกับ proxy.ts) — call site เดิม <AdminNav /> ไม่ต้องแก้ */
+export async function AdminNav() {
+  const staff = await getStaff();
+  const tabs = staff ? TABS.filter((t) => rolesForPath(t.href)?.includes(staff.role)) : [];
+  return <AdminNavClient tabs={tabs} />;
 }

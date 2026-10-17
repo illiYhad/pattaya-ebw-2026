@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { data } from "@/lib/data";
 import { AdminNav } from "@/components/admin/AdminNav";
+import { getStaff } from "@/lib/auth";
 import { ScoreEntryClient, type AuditRow, type EntryRow } from "@/components/admin/ScoreEntryClient";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +20,7 @@ export default async function ScoreCategoryPage({ params }: { params: Promise<{ 
   const [entries, competitors, sheets, board, audit] = await Promise.all([
     data.getEntries(category.id), data.getCompetitors(), data.getScoreSheets(category.id), data.getResultBoard(category.id), data.getScoreAudit(category.id),
   ]);
+  const isAdmin = (await getStaff())?.role === "admin"; // ลิงก์ "ผล / เปิดผล" เฉพาะแอดมิน
   const compOf = new Map(competitors.map((c) => [c.id, c]));
   const rows: EntryRow[] = entries
     .map((e) => ({ e, c: compOf.get(e.competitor_id) }))
@@ -41,7 +43,7 @@ export default async function ScoreCategoryPage({ params }: { params: Promise<{ 
         <h1 className="text-xl font-bold">กรอกคะแนน · {category.name}</h1>
         <div className="flex flex-wrap gap-2 text-sm">
           <Link className="rounded bg-surface px-3 py-1.5" href="/admin/score">ทุกประเภท</Link>
-          <Link className="rounded bg-surface px-3 py-1.5" href="/admin/results">ผล / เปิดผล</Link>
+          {isAdmin && <Link className="rounded bg-surface px-3 py-1.5" href="/admin/results">ผล / เปิดผล</Link>}
           <Link className="rounded bg-surface px-3 py-1.5" href={`/print/scoresheet/${category.code}`} target="_blank">พิมพ์ใบคะแนน</Link>
         </div>
       </div>
