@@ -83,8 +83,11 @@ function ScoreCell({ category, row, judgeNo, sheet, locked }: { category: Catego
   );
 }
 
-export function ScoreEntryClient({ category, rows, sheets, published, audit }: { category: Category; rows: EntryRow[]; sheets: ScoreSheet[]; published: boolean; audit: AuditRow[] }) {
+export function ScoreEntryClient({ category, rows, sheets, published, audit, isAdmin }: { category: Category; rows: EntryRow[]; sheets: ScoreSheet[]; published: boolean; audit: AuditRow[]; isAdmin: boolean }) {
   const judges = Array.from({ length: category.judge_count }, (_, i) => i + 1);
+  // จอแคบ (< sm): โชว์ทีละกรรมการ ตรงกับที่สตาฟกรอกทีละใบกระดาษ · จอ sm ขึ้นไปโชว์ทุกคอลัมน์เหมือนเดิม
+  const [judge, setJudge] = useState(1);
+  const colCls = (j: number) => (j === judge ? "" : "hidden sm:table-cell");
   const criteriaMode = isCriteriaMode(category);
   const sheetOf = (entryId: string, judgeNo: number) => sheets.find((s) => s.entry_id === entryId && s.judge_no === judgeNo);
 
@@ -94,7 +97,16 @@ export function ScoreEntryClient({ category, rows, sheets, published, audit }: {
         {criteriaMode ? `โหมดรายเกณฑ์ ${category.criteria.length} ข้อ (เต็ม ${maxTotal(category)})` : "โหมดคะแนนรวม ช่องเดียว (เต็ม 100)"} · กรรมการ {category.judge_count} คน · ทศนิยมได้ 1 ตำแหน่ง · กรอกครบทุกช่องของใบนั้นแล้วออกจากช่อง ระบบบันทึกให้เอง
       </p>
       {published && (
-        <p className="rounded border border-amber-400/60 bg-amber-500/10 p-3 text-sm text-amber-200">🔒 ประกาศผลแล้ว ต้องซ่อนผลก่อนแก้คะแนน (ไปที่ &quot;ผล / เปิดผล&quot;)</p>
+        <p className="rounded border border-amber-400/60 bg-amber-500/10 p-3 text-sm text-amber-200">
+          {isAdmin ? <>🔒 ประกาศผลแล้ว ต้องซ่อนผลก่อนแก้คะแนน (ไปที่ &quot;ผล / เปิดผล&quot;)</> : <>🔒 ประกาศผลแล้ว แก้คะแนนไม่ได้ — ติดต่อแอดมินให้ซ่อนผลก่อน</>}
+        </p>
+      )}
+      {category.judge_count > 1 && (
+        <div className="flex gap-2 sm:hidden" role="group" aria-label="เลือกกรรมการ">
+          {judges.map((j) => (
+            <button key={j} type="button" aria-pressed={j === judge} onClick={() => setJudge(j)} className={`flex-1 rounded px-3 py-2 text-sm font-bold ${j === judge ? "bg-accent text-black" : "bg-surface text-muted"}`}>กรรมการ {j}</button>
+          ))}
+        </div>
       )}
 
       <div className="max-w-full overflow-x-auto rounded-xl bg-surface">
@@ -102,7 +114,7 @@ export function ScoreEntryClient({ category, rows, sheets, published, audit }: {
           <thead className="text-xs text-muted">
             <tr>
               <th className="sticky left-0 z-10 min-w-[8.5rem] bg-surface p-2 text-left">ผู้แข่ง</th>
-              {judges.map((j) => <th key={j} className={`p-2 text-left ${criteriaMode ? "min-w-[13rem]" : "min-w-[9rem]"}`}>กรรมการ {j}</th>)}
+              {judges.map((j) => <th key={j} className={`p-2 text-left ${criteriaMode ? "min-w-[13rem]" : "min-w-[9rem]"} ${colCls(j)}`}>กรรมการ {j}</th>)}
             </tr>
           </thead>
           <tbody>
@@ -118,7 +130,7 @@ export function ScoreEntryClient({ category, rows, sheets, published, audit }: {
                     <span className={`mt-1 inline-block rounded px-2 py-0.5 text-[11px] ${tone}`}>{status}</span>
                   </td>
                   {judges.map((j) => (
-                    <td key={j} className="p-2">
+                    <td key={j} className={`p-2 ${colCls(j)}`}>
                       <ScoreCell key={`${r.entryId}-${j}`} category={category} row={r} judgeNo={j} sheet={sheetOf(r.entryId, j)} locked={published} />
                     </td>
                   ))}

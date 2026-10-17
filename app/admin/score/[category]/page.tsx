@@ -47,7 +47,7 @@ export default async function ScoreCategoryPage({ params }: { params: Promise<{ 
           <Link className="rounded bg-surface px-3 py-1.5" href={`/print/scoresheet/${category.code}`} target="_blank">พิมพ์ใบคะแนน</Link>
         </div>
       </div>
-      <ScoreEntryClient category={category} rows={rows} sheets={sheets} published={board.published} audit={auditRows} />
+      <ScoreEntryClient category={category} rows={rows} sheets={sheets} published={board.published} audit={auditRows} isAdmin={isAdmin} />
     </div>
   );
 }
