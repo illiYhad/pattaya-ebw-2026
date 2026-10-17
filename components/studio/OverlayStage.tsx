@@ -7,16 +7,26 @@ import { EVENTS, entryChannelName, openBus, type BugCorner, type HubEventMap, ty
 import { publicPhoto } from "@/lib/people";
 import { EVENT } from "@/lib/event";
 import { Avatar } from "@/components/profile/Avatar";
-import { BRAND, EventLogo, OfficialBug, OfficialHeader, Seal, Watermark } from "@/components/brand/Brand";
+import { BRAND, EventLogo, OfficialBug, OfficialHeader, Seal } from "@/components/brand/Brand";
 import { SponsorLogo } from "./SponsorLogo";
+import { ResultScene, ScoreScene, usePublicResults, type Directory } from "./ResultScenes";
 import { Stinger } from "./Stinger";
+import styles from "./LiveArtwork.module.css";
+
+const s = (name: string) => styles[name] ?? name;
 
 const BAR_ROTATE_MS = 8000;
-const TONE: Record<HudTone, string> = { info: "bg-accent text-black", warn: "bg-amber-400 text-black", alert: "bg-live text-white" };
+/** สีป้ายแจ้งเตือนชุดโปสเตอร์ (K-P1.12): info เขียวหัวเป็ด · warn กระดาษครีม · alert โรสโกลด์เข้ม */
+const TONE: Record<HudTone, string> = { info: s("hudInfo"), warn: s("hudWarn"), alert: s("hudAlert") };
 const SPONSOR_H = 44;
 const BUG_MARGIN = 64;
 const LT_LEFT = 64;
 const LT_BOTTOM = 120;
+/** ภาพหัวโปสเตอร์ PMAT (public/artwork/head.jpg 1024×518) — แสดงส่วนบนเหนือป้าย ขนาดจริง */
+const HEAD_SRC = "/artwork/head.jpg";
+const HEAD_ALT = "EASTERN BEAUTY & WELLNESS CHAMPIONSHIP 2026 · 30 OCTOBER 2026 · PATTAYA, THAILAND";
+/** ตรามุมจอบนฉาก LIVE: พื้นเขียวหัวเป็ด ขอบโรสโกลด์ (ทับ bg-bg/70 ของ OfficialBug) */
+const BUG_SKIN: React.CSSProperties = { background: "rgba(13,53,64,.88)", border: "2px solid #D9B39C", boxShadow: "inset 0 0 0 3px #0D3540" };
 
 type Props = {
   channelKey: string;
@@ -27,16 +37,18 @@ type Props = {
   inCategory: number;
   sponsors: Sponsor[];
   photos: AthletePhoto[];
+  /** ผู้แข่ง/รายการ/ประเภททั้งงาน — ให้ฉาก RESULT/SCORE เลือกแสดงรายการอื่นจากห้องคุมได้ (ข้อมูลสาธารณะ ไม่มีคะแนน) */
+  directory: Directory;
   stingerVideo?: string;
 };
 
-/** แถบโค้งทอง/ชมพู/เส้นงาช้างด้านล่างจอ (ตาม 2_LiveScore) — พื้นโปร่ง */
-function LiveRibbons({ low = false }: { low?: boolean }) {
+/** แถบโค้งโรสโกลด์/ครีมด้านล่างจอ (โครงเดิมจาก 2_LiveScore · เปลี่ยนสีเข้าชุดโปสเตอร์) — พื้นโปร่ง */
+function LiveRibbons() {
   return (
-    <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true" className="pointer-events-none absolute left-0 top-0" style={low ? { transform: "translateY(150px)" } : undefined}>
-      <path d="M -100 1120 C 300 820, 900 1010, 2020 700" stroke="var(--gold)" strokeWidth="54" fill="none" />
-      <path d="M -100 1190 C 360 900, 960 1080, 2020 790" stroke="var(--pink)" strokeWidth="26" fill="none" />
-      <path d="M -100 1236 C 400 960, 1000 1130, 2020 850" stroke="var(--ivory)" strokeWidth="3" fill="none" opacity="0.6" />
+    <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true" className="pointer-events-none absolute left-0 top-0">
+      <path d="M -100 1120 C 300 820, 900 1010, 2020 700" stroke="#C9A48F" strokeWidth="54" fill="none" />
+      <path d="M -100 1190 C 360 900, 960 1080, 2020 790" stroke="#F1D9C8" strokeWidth="26" fill="none" />
+      <path d="M -100 1236 C 400 960, 1000 1130, 2020 850" stroke="#FFF6EF" strokeWidth="3" fill="none" opacity="0.6" />
     </svg>
   );
 }
@@ -44,36 +56,63 @@ function LiveRibbons({ low = false }: { low?: boolean }) {
 /** ป้าย "EBW 2026 · LIVE" มุมซ้ายบน */
 function LiveBadge() {
   return (
-    <div className="absolute left-16 top-16 z-20 flex items-center gap-3.5 rounded-full bg-bg py-2.5 pl-[18px] pr-7">
-      <div className="h-4 w-4 rounded-full" style={{ background: "var(--pink)" }} />
-      <div className="num text-[30px] font-bold tracking-[0.2em]">EBW 2026 · LIVE</div>
+    <div className={s("badge")}>
+      <div className={s("badgeDot")} />
+      <div className={`num ${s("badgeText")}`}>EBW 2026 · LIVE</div>
     </div>
   );
 }
 
-/** ป้ายชื่อผู้แข่ง (lower third): แผงเข้มมุมโค้งซ้าย · รูปวงกลม 196px ขอบทอง + เลข EBW + ชื่อไทย/อังกฤษ + ประเภท */
+/** รูปผู้แข่งวงกลมขอบโรสโกลด์ (ไม่มีรูป = เงา) */
+function RoundAvatar({ src, name, size }: { src?: string; name: string; size: number }) {
+  return (
+    <div className={s("avatar")} style={{ width: size, height: size }}>
+      <Avatar src={src} name={name} size="fill" />
+    </div>
+  );
+}
+
+/** ภาพหัวโปสเตอร์ส่วนบน (ตรา PMAT + ชื่องาน + วันที่ เป็นอาร์ตของ PMAT เอง) */
+function PosterHead() {
+  return (
+    <div className={s("head")}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={HEAD_SRC} width={1024} height={518} alt={HEAD_ALT} />
+    </div>
+  );
+}
+
+/** ภาพท้ายโปสเตอร์ (หอย/ปะการัง/ถ้วย) ชิดขอบล่าง */
+function PosterBottom() {
+  return (
+    <div className={s("bot")} aria-hidden="true">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/schedule/bottom.jpg" width={1024} height={318} alt="" />
+    </div>
+  );
+}
+
+/** ป้ายชื่อผู้แข่ง (lower third): แผ่นเขียวหัวเป็ดขอบโรสโกลด์ มุมโค้งซ้าย · รูปวงกลม 196px + เลข EBW + ชื่อไทย/อังกฤษ + ประเภท */
 function LowerThird({ competitor, category, show, photo }: { competitor: Competitor; category: Category; show: boolean; photo?: string }) {
   return (
-    <div
-      className="absolute flex items-center gap-[34px] rounded-l-[140px] rounded-r-[28px] bg-bg py-[26px] pl-[26px] pr-14 shadow-[0_18px_50px_rgba(0,0,0,0.35)] transition-all duration-500"
-      style={{ left: LT_LEFT, bottom: LT_BOTTOM, opacity: show ? 1 : 0, transform: show ? "translateX(0)" : "translateX(-40px)" }}
-    >
-      <Avatar src={photo} name={competitor.name_th} size="lg" round className="!h-[196px] !w-[196px] shrink-0 !border-[6px] !text-6xl" />
-      <div className="flex min-w-[560px] max-w-[1000px] flex-col gap-1.5">
-        <div className="num text-[28px] font-semibold tracking-[0.22em]" style={{ color: "var(--pink)" }}>{competitor.code}</div>
-        <div className="text-[72px] font-bold leading-[1.02]">{competitor.name_th}</div>
-        <div className="text-[30px] font-light text-muted">{competitor.name_en}</div>
-        <div className="mt-1 text-[26px] text-muted">{category.name}{competitor.shop ? ` · ${competitor.shop}` : ""}</div>
+    <div className={s("lt")} style={{ left: LT_LEFT, bottom: LT_BOTTOM, opacity: show ? 1 : 0, transform: show ? "translateX(0)" : "translateX(-40px)" }}>
+      <RoundAvatar src={photo} name={competitor.name_th} size={196} />
+      <div className={s("ltText")}>
+        <div className={`num ${s("ltCode")}`}>{competitor.code}</div>
+        <div className={s("ltName")}>{competitor.name_th}</div>
+        <div className={s("ltEn")}>{competitor.name_en}</div>
+        <div className={s("ltCat")}>{category.name}{competitor.shop ? ` · ${competitor.shop}` : ""}</div>
       </div>
     </div>
   );
 }
 
-export function OverlayStage({ channelKey, category, entry, competitor, inCategory, sponsors, photos, stingerVideo }: Props) {
+export function OverlayStage({ channelKey, category, entry, competitor, inCategory, sponsors, photos, directory, stingerVideo }: Props) {
   const [scene, setScene] = useState<Scene>("STARTING");
   const [hud, setHud] = useState<{ text: string; tone: HudTone } | null>(null);
   const [bug, setBug] = useState<BugCorner>("bl");
   const [lowerThird, setLowerThird] = useState(true);
+  const [focus, setFocus] = useState<HubEventMap["result_focus"]>({});
   const [stingerId, setStingerId] = useState(0);
   const pending = useRef<Scene | undefined>(undefined);
   const [barIdx, setBarIdx] = useState(0);
@@ -97,6 +136,7 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
           break;
         case EVENTS.brandBug: setBug((raw as HubEventMap["brand_bug"]).corner); break;
         case EVENTS.lowerThird: setLowerThird((raw as HubEventMap["lower_third"]).show); break;
+        case EVENTS.resultFocus: setFocus(raw as HubEventMap["result_focus"]); break;
       }
     });
     return () => { off(); bus.close(); };
@@ -107,6 +147,14 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
     const t = setInterval(() => setBarIdx((i) => i + 1), BAR_ROTATE_MS);
     return () => clearInterval(t);
   }, [bars.length]);
+
+  // ฉาก RESULT = โพเดียมของ focus.category_id (ค่าเริ่ม = ประเภทของ channel) · ฉาก SCORE = focus.entry_id (ค่าเริ่ม = รายการของ channel)
+  const scoreEntry = directory.entries.find((e) => e.id === (focus.entry_id ?? entry.id)) ?? entry;
+  const resultCategory = directory.categories.find((c) => c.id === (focus.category_id ?? category.id)) ?? category;
+  const scoreCategory = directory.categories.find((c) => c.id === scoreEntry.category_id) ?? category;
+  const resultsActive = scene === "RESULT" || scene === "SCORE";
+  const publicCategory = scene === "SCORE" ? scoreCategory : resultCategory;
+  const results = usePublicResults(publicCategory.code, resultsActive);
 
   const onCovered = useCallback(() => {
     if (pending.current) setScene(pending.current);
@@ -124,24 +172,25 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
   const bugFixed: React.CSSProperties = bug === "bl" && lowerThird ? { right: 64, bottom: bugBottom } : bugStyle;
 
   return (
-    <div className="relative h-[1080px] w-[1920px] overflow-hidden text-text" style={{ background: "transparent" }}>
+    <div className={`relative h-[1080px] w-[1920px] overflow-hidden ${s("stage")}`} style={{ background: "transparent" }}>
       {scene === "STARTING" && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-8 overflow-hidden bg-bg/95">
-          <Watermark height={820} />
-          <LiveRibbons low />
-          <OfficialHeader showLogo={false} />
-          <EventLogo variant="white" width={480} priority />
-          <div className="relative text-5xl font-black">เริ่มเร็ว ๆ นี้</div>
-          <div className="relative flex items-center gap-12">
-            <Avatar src={photo} name={competitor.name_th} size="xl" />
-            <div className="max-w-[900px] space-y-3">
-              <div className="text-[30px] font-bold tracking-widest" style={{ color: "var(--accent-2)" }}>{competitor.code}</div>
-              <div className="text-6xl font-black leading-tight">{competitor.name_th}</div>
-              <div className="text-4xl text-muted">{competitor.name_en}</div>
-              {competitor.shop && <div className="text-3xl text-muted">{competitor.shop}</div>}
+        <div className={s("fs")}>
+          <div className={s("col")} style={{ top: 150 }}>
+            <PosterHead />
+            <div className={s("plate")}>
+              <h1 className={s("plateTitle")}>เริ่มเร็ว ๆ นี้</h1>
             </div>
+            <div className={`${s("card")} mt-8 flex items-center gap-10`}>
+              <RoundAvatar src={photo} name={competitor.name_th} size={200} />
+              <div className="max-w-[720px] space-y-1">
+                <div className="num text-[30px] font-semibold tracking-widest" style={{ color: "#8E6450" }}>{competitor.code}</div>
+                <div className="text-[60px] font-bold leading-tight" style={{ color: "#1D4652" }}>{competitor.name_th}</div>
+                <div className="text-[34px]" style={{ color: "#5B4A40" }}>{competitor.name_en}</div>
+                {competitor.shop && <div className="text-[30px]" style={{ color: "#5B4A40" }}>{competitor.shop}</div>}
+              </div>
+            </div>
+            <div className={`${s("chipDark")} mt-7`}>{category.name} · {timeRangeOf(category)} · ผู้แข่ง {inCategory} คน</div>
           </div>
-          <div className="relative text-3xl text-muted">{category.name} · {timeRangeOf(category)} · ผู้แข่ง {inCategory} คน</div>
         </div>
       )}
 
@@ -150,71 +199,81 @@ export function OverlayStage({ channelKey, category, entry, competitor, inCatego
           <LiveRibbons />
           <LiveBadge />
           <LowerThird competitor={competitor} category={category} show={lowerThird} photo={photo} />
-          {bug !== "hidden" && <OfficialBug size="sm" className="absolute" style={bugFixed} />}
+          {bug !== "hidden" && <OfficialBug size="sm" className="absolute" style={{ ...bugFixed, ...BUG_SKIN }} />}
         </>
       )}
 
       {scene === "BREAK" && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-8 overflow-hidden bg-bg/95">
-          <Watermark height={820} />
-          <LiveRibbons low />
-          <OfficialHeader showLogo={false} />
-          <EventLogo variant="white" width={640} priority />
-          <div className="relative text-8xl font-black">พักการแข่งขัน</div>
-        </div>
-      )}
-
-      {scene === "RESULT" && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 overflow-hidden bg-bg/95">
-          <Watermark height={820} />
-          <LiveRibbons low />
-          <OfficialHeader />
-          <div className="relative text-4xl text-accent">{category.name}</div>
-          <div className="relative text-6xl font-black">{competitor.name_th}</div>
-          <div className="relative text-3xl text-muted">{competitor.name_en} · {competitor.code}</div>
-          <div className="relative mt-4 rounded-2xl border-2 border-dashed border-white/20 px-16 py-8 text-center">
-            <div className="text-7xl font-black" style={{ color: "var(--gold)" }}>รอประกาศผล</div>
-            <div className="mt-2 text-2xl text-muted">ผลคะแนนและอันดับจะแสดงเมื่อประกาศผลแล้ว</div>
+        <div className={s("fs")}>
+          <PosterBottom />
+          <div className={s("col")} style={{ top: 170 }}>
+            <PosterHead />
+            <div className={s("plate")}>
+              <h1 className={`${s("plateTitle")} ${s("xl")}`}>พักการแข่งขัน</h1>
+            </div>
           </div>
         </div>
       )}
 
+      {scene === "RESULT" && (
+        <div className={s("fs")}>
+          <OfficialHeader />
+          {results.status === "published" && <LiveRibbons />}
+          <ResultScene category={resultCategory} results={results} dir={directory} photos={photos} />
+        </div>
+      )}
+
+      {scene === "SCORE" && (
+        <div className={s("fs")}>
+          <OfficialHeader />
+          <LiveRibbons />
+          <ScoreScene category={scoreCategory} entry={scoreEntry} results={results} dir={directory} photos={photos} />
+        </div>
+      )}
+
       {scene === "SPONSOR" && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-10 overflow-hidden bg-bg/95">
-          <Watermark height={820} />
-          <LiveRibbons low />
+        <div className={s("fs")}>
           <LiveBadge />
+          <PosterBottom />
           {fullScreenSponsors.length === 0 ? (
-            <>
-              <EventLogo variant="white" width={760} priority />
-              <div className="relative flex items-center gap-5 text-4xl"><Seal size={120} /><span>จัดโดย {BRAND.organizer}</span></div>
-            </>
+            <div className={s("col")} style={{ top: 150 }}>
+              <PosterHead />
+              <div className={s("plate")}>
+                <span className={s("plateTitle")} style={{ fontSize: 48 }}>จัดโดย {BRAND.organizer}</span>
+              </div>
+            </div>
           ) : (
             <>
-              <div className="relative text-4xl text-muted">ขอบคุณผู้สนับสนุน</div>
-              {fullScreenSponsors.map((s) => (
-                <div key={s.id} className="relative"><SponsorLogo sponsor={s} className={s.level === "main" ? "h-40" : "h-24"} /></div>
-              ))}
-              <div className="absolute bottom-16 left-1/2 flex -translate-x-1/2 items-center gap-6"><EventLogo variant="white" width={260} /><Seal size={96} /></div>
+              <div className={s("col")} style={{ top: 120 }}>
+                <div className={s("plate")} style={{ marginTop: 0 }}>
+                  <h1 className={s("plateTitle")}>ขอบคุณผู้สนับสนุน</h1>
+                </div>
+                <div className={`${s("card")} mt-8 flex flex-col items-center gap-8`}>
+                  {fullScreenSponsors.map((sp) => (
+                    <div key={sp.id} className="relative"><SponsorLogo sponsor={sp} className={sp.level === "main" ? "h-40" : "h-24"} /></div>
+                  ))}
+                </div>
+              </div>
+              <div className="absolute bottom-16 left-1/2 z-10 flex -translate-x-1/2 items-center gap-6"><EventLogo variant="white" width={260} /><Seal size={96} /></div>
             </>
           )}
         </div>
       )}
 
       {scene !== "SPONSOR" && corner && (
-        <div className={`absolute rounded-lg bg-bg/80 px-4 py-2 text-2xl ${fullScreen ? "bottom-16 right-16" : bug === "tr" ? "left-16 top-16" : "right-16 top-16"}`}>
+        <div className={`absolute rounded-lg px-4 py-2 text-2xl ${s("chipBox")} ${fullScreen ? "bottom-16 right-16" : bug === "tr" ? "left-16 top-16" : "right-16 top-16"}`}>
           <SponsorLogo sponsor={corner} />
         </div>
       )}
       {sponsorBarShown && barSponsor && (
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-3 bg-bg/85 text-xl text-muted" style={{ height: SPONSOR_H }}>
+        <div className={`absolute inset-x-0 bottom-0 flex items-center justify-center gap-3 text-xl ${s("sponsorBar")}`} style={{ height: SPONSOR_H }}>
           <span className="text-base">สนับสนุนโดย</span>
           <SponsorLogo sponsor={barSponsor} className="h-7" />
         </div>
       )}
 
       {hud && (
-        <div className={`absolute inset-x-0 z-30 mx-auto w-fit rounded-xl px-12 py-4 text-5xl font-black shadow-2xl ${TONE[hud.tone]}`} style={{ top: 64 }}>
+        <div className={`absolute inset-x-0 z-30 mx-auto w-fit rounded-xl px-12 py-4 text-5xl font-black ${s("hud")} ${TONE[hud.tone]}`} style={{ top: 64 }}>
           {hud.text}
         </div>
       )}

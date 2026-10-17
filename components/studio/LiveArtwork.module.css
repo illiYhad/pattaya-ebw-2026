@@ -1,0 +1,83 @@
+/* ==========================================================================
+   กราฟิกไลฟ์ 1920×1080 ชุดโปสเตอร์ PMAT (K-P1.11) — สี/วัสดุเดียวกับ PosterPage.module.css
+   เขียวหัวเป็ด #0D3540 #123F4B #1F5866 #2A6B79 · โรสโกลด์ #9E7058 #A27C66 #C9A48F #D9B39C #F1D9C8 · กระดาษ #E9DCD6 #EBDDD8 #E3D2CA
+   ========================================================================== */
+.stage{font-family:var(--font-sarabun),"Sarabun",system-ui,sans-serif;color:#FFF6EF}
+
+/* ---- ฉากเต็มจอ: backdrop.jpg + ไล่เข้ม (แบบ .pp::before) ---- */
+.fs{position:absolute;inset:0;overflow:hidden;background:#0D3540}
+.fs::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(6,30,38,.55),rgba(6,30,38,.80)),url(/schedule/backdrop.jpg) center/cover no-repeat}
+.col{position:absolute;left:50%;transform:translateX(-50%);width:1024px;display:flex;flex-direction:column;align-items:center}
+
+/* ---- ภาพหัวโปสเตอร์ (ส่วนบนเหนือป้าย 1024×366 ขนาดจริง ไม่ยืด) ---- */
+.head{position:relative;width:1024px;height:366px;overflow:hidden;border-radius:18px 18px 0 0;box-shadow:0 24px 64px rgba(0,0,0,.45)}
+.head img{display:block;width:1024px;height:518px}
+.head::after{content:"";position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(to bottom,rgba(13,53,64,0),rgba(13,53,64,.94))}
+
+/* ---- ป้ายชื่อฉาก (แบบ .pp-plate มือถือ ขยายสำหรับจอ 1920) ---- */
+.plate{position:relative;z-index:3;margin-top:-48px;min-width:640px;max-width:1000px;padding:20px 64px 24px;text-align:center;border-radius:999px/90px;color:#F6EDE6;
+  background:radial-gradient(120% 140% at 50% 0%,#2E6F7D 0,#174A57 45%,#0D3540 100%);
+  border:2.5px solid #D9B39C;
+  box-shadow:inset 0 0 0 4px #0D3540,inset 0 0 0 6px #C9A48F,0 0 0 2px #9E7058,0 16px 36px rgba(4,22,28,.5)}
+.plate::before,.plate::after{content:"";position:absolute;top:50%;width:20px;height:20px;margin-top:-10px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0,#F1E3DA 30%,#C9AC9B 70%,#8F6E5D 100%);box-shadow:0 2px 3px rgba(0,0,0,.4)}
+.plate::before{left:-11px}.plate::after{right:-11px}
+.plateTitle{margin:0;font-size:64px;font-weight:600;line-height:1.25;color:#FFF6EF;text-shadow:0 2px 0 rgba(0,0,0,.35),0 0 18px rgba(241,217,200,.25)}
+.plateTitle.xl{font-size:84px}
+.plateSub{display:block;margin-top:4px;font-size:30px;font-weight:500;line-height:1.35;color:#F1D9C8}
+.plateRow{display:flex;align-items:center;justify-content:center;gap:24px}
+
+/* ---- แผ่นกระดาษ parchment (แบบ .pp-mid + .pp-card) ---- */
+.card{position:relative;z-index:2;border-radius:30px;padding:28px 44px;color:#28201A;
+  background:linear-gradient(90deg,#E9DCD6,#EBDDD8 15%,#EBDCD7 85%,#E3D2CA);
+  border:2.5px solid #D9B39C;box-shadow:0 0 0 1.5px #9E7058,0 0 0 7px #F6EAE2,0 0 0 8.5px #C9A48F,0 18px 40px rgba(0,0,0,.4)}
+
+/* ---- ชิป / ป้ายเม็ดยา ---- */
+.chip{display:inline-flex;align-items:center;gap:10px;min-height:54px;padding:8px 26px;border-radius:999px;font-size:28px;font-weight:500;color:#1D4652;background:rgba(255,250,246,.86);border:2px solid #D2B3A1;white-space:nowrap}
+.chipDark{display:inline-flex;align-items:center;gap:12px;min-height:60px;padding:8px 30px;border-radius:999px;font-size:30px;font-weight:500;color:#F6EDE6;white-space:nowrap;
+  background:linear-gradient(180deg,#2A6B79,#123F4B);border:2px solid #D9B39C;box-shadow:inset 0 0 0 3px #0D3540,0 4px 12px rgba(0,0,0,.35)}
+.pill{display:inline-block;padding:12px 72px 20px;border-radius:999px;font-weight:600;line-height:1.15;color:#FFF6EF;
+  background:linear-gradient(180deg,#2A6B79,#103C48);border:2.5px solid #D9B39C;box-shadow:inset 0 0 0 4px #0D3540,inset 0 0 0 6px #C9A48F,0 8px 22px rgba(60,35,20,.35)}
+.note{position:relative;margin:0;padding:12px 28px;text-align:center;font-size:30px;font-weight:600;line-height:1.5;color:#1D4652;border-top:2px solid #C9A48F;border-bottom:2px solid #C9A48F;background:linear-gradient(90deg,transparent,rgba(255,250,246,.7) 20%,rgba(255,250,246,.7) 80%,transparent)}
+.note::before,.note::after{content:"✦";margin:0 .5em;color:#A27C66;font-weight:400}
+
+/* ---- รูปผู้แข่งวงกลมขอบโรสโกลด์ ---- */
+.avatar{position:relative;flex:none;overflow:hidden;border-radius:50%;border:6px solid #D9B39C;box-shadow:0 0 0 2.5px #9E7058,0 10px 24px rgba(0,0,0,.4)}
+.avatar > div{width:100%;height:100%;border-radius:0;background:radial-gradient(circle at 50% 35%,#2A6B79,#123F4B 70%)}
+
+/* ---- ภาพท้ายโปสเตอร์ (1024×318 ขนาดจริง · ชิดขอบล่าง · จางขอบบน) ---- */
+.bot{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:1024px;height:318px;z-index:1;
+  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 16%),linear-gradient(to right,transparent,#000 12%,#000 88%,transparent);
+  mask-image:linear-gradient(to bottom,transparent,#000 16%),linear-gradient(to right,transparent,#000 12%,#000 88%,transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect}
+.bot img{display:block;width:1024px;height:318px}
+
+/* ---- ฉาก LIVE ---- */
+.badge{position:absolute;left:64px;top:64px;z-index:20;display:flex;align-items:center;gap:14px;padding:10px 30px 10px 20px;border-radius:999px;color:#FFF6EF;
+  background:radial-gradient(120% 140% at 50% 0%,#2E6F7D 0,#174A57 45%,#0D3540 100%);border:2px solid #D9B39C;box-shadow:inset 0 0 0 3px #0D3540,0 6px 16px rgba(0,0,0,.35)}
+.badgeDot{width:16px;height:16px;border-radius:50%;background:#E7A9B1;box-shadow:0 0 0 3px rgba(231,169,177,.35)}
+.badgeText{font-size:30px;font-weight:700;letter-spacing:.2em}
+.lt{position:absolute;display:flex;align-items:center;gap:34px;padding:22px 56px 22px 22px;border-radius:140px 28px 28px 140px;color:#FFF6EF;transition:all .5s;
+  background:radial-gradient(120% 140% at 30% 0%,#2E6F7D 0,#174A57 45%,#0D3540 100%);
+  border:2.5px solid #D9B39C;box-shadow:inset 0 0 0 4px #0D3540,inset 0 0 0 6px #C9A48F,0 0 0 2px #9E7058,0 18px 50px rgba(0,0,0,.4)}
+.ltText{display:flex;flex-direction:column;gap:6px;min-width:560px;max-width:1000px}
+.ltCode{font-size:28px;font-weight:600;letter-spacing:.22em;color:#F1D9C8}
+.ltName{font-size:72px;font-weight:700;line-height:1.02;color:#FFF6EF;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.ltEn{font-size:30px;font-weight:400;color:#F1D9C8}
+.ltCat{margin-top:4px;font-size:26px;color:rgba(255,246,239,.85)}
+
+/* ---- ฉาก RESULT: สกอร์บอร์ดกระดาษ ---- */
+.board{display:flex;flex-direction:column;align-items:center;gap:22px;width:1140px;padding:30px 48px 40px}
+.boardName{margin:0;font-size:64px;font-weight:700;line-height:1.2;color:#1D4652}
+.boardEn{font-size:30px;color:#5B4A40}
+.result{font-size:120px}
+
+/* ---- ป้ายบนจอระหว่างไลฟ์ (K-P1.12 · สีอย่างเดียว ตำแหน่ง/ขนาดเดิม) ---- */
+.hud{border:2.5px solid #D9B39C;box-shadow:inset 0 0 0 4px rgba(13,53,64,.9),0 0 0 2px #9E7058,0 18px 44px rgba(0,0,0,.45)}
+.hudInfo{color:#FFF6EF;background:radial-gradient(120% 140% at 50% 0%,#2E6F7D 0,#174A57 45%,#0D3540 100%)}
+.hudWarn{color:#1D4652;background:linear-gradient(90deg,#E9DCD6,#EBDDD8 15%,#EBDCD7 85%,#E3D2CA);box-shadow:0 0 0 2px #9E7058,0 18px 44px rgba(0,0,0,.45)}
+.hudAlert{color:#FFF6EF;background:linear-gradient(180deg,#A27C66,#7A4E3C);text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.chipBox{color:#FFF6EF;background:rgba(13,53,64,.88);border:2px solid #D9B39C}
+.sponsorBar{color:#F1D9C8;background:rgba(13,53,64,.92);border-top:2px solid #C9A48F}
+
+/* ---- รูปแทนผู้แข่ง (ไม่มีรูป) ครีม/โรสโกลด์บนเขียวหัวเป็ด (K-P1.12a · ทับสีม่วงของ Avatar เฉพาะกราฟิกไลฟ์) ---- */
+.avatar svg{color:#E8CBB8}

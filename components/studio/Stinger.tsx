@@ -6,7 +6,9 @@ import { BRAND, EventLogo, EventMark, Seal } from "@/components/brand/Brand";
 import { SponsorLogo } from "./SponsorLogo";
 
 export const STINGER_MS = 1400;
-const COVER_AT = 0.5; // สัดส่วนเวลาที่จอถูกปิดมิด (สลับฉากตรงนี้ = 700ms)
+const COVER_AT = 0.5;
+/** สีสติงเกอร์ชุดเดียวกับกราฟิกไลฟ์ (LiveArtwork.module.css) — ใส่เฉพาะที่นี่ ไม่แตะ --brand-navy/--brand-blue ที่หน้าเว็บใช้ร่วม */
+const ST = { teal0: "#0D3540", teal1: "#174A57", teal2: "#2A6B79", rose: "#C9A48F", cream: "#FFF6EF", blush: "#F1D9C8" }; // สัดส่วนเวลาที่จอถูกปิดมิด (สลับฉากตรงนี้ = 700ms)
 
 /**
  * สติงเกอร์ EBW Championship 2026 (ใบ 1418 ข้อ 3.1): แผ่นน้ำเงินเอียงกวาดเข้า → เส้นคลื่นฟ้าวิ่งตาม → โลโก้บินเข้า → ตรา/สปอนเซอร์ → ปิดมิด (onCovered) → ค้าง → กวาดออก
@@ -106,30 +108,32 @@ export function Stinger({
       ) : (
         <>
           {/* แผ่นน้ำเงินเอียง + ลายน้ำนก */}
-          <div ref={plateRef} className="absolute -inset-x-[20%] inset-y-0 overflow-hidden" style={{ background: "linear-gradient(120deg, var(--brand-navy) 0%, var(--brand-blue) 100%)", transform: "skewX(-12deg) translateX(-115%)" }}>
+          <div ref={plateRef} className="absolute -inset-x-[20%] inset-y-0 overflow-hidden" style={{ background: `linear-gradient(120deg, ${ST.teal0} 0%, ${ST.teal1} 55%, ${ST.teal2} 100%)`, boxShadow: `inset 0 0 0 6px ${ST.rose}`, transform: "skewX(-12deg) translateX(-115%)" }}>
             <div className="absolute right-[18%] top-1/2 -translate-y-1/2" style={{ opacity: 0.06, transform: "skewX(12deg) translateY(-50%)" }}>
               <EventMark variant="white" size={900} />
             </div>
           </div>
           {/* เส้นคลื่นฟ้า */}
-          <div ref={line1Ref} className="absolute left-0 top-[52%] h-[14px] w-full" style={{ background: "linear-gradient(90deg, var(--accent), var(--brand-cyan))", opacity: 0 }} />
-          <div ref={line2Ref} className="absolute left-0 top-[56%] h-[6px] w-full" style={{ background: "linear-gradient(90deg, var(--accent), var(--brand-cyan))", opacity: 0 }} />
-          {/* โลโก้ */}
-          <div ref={logoRef} className="absolute left-1/2 top-[44%] -translate-x-1/2 -translate-y-1/2" style={{ opacity: 0 }}>
-            <EventLogo variant="white" width={920} priority />
-          </div>
-          {/* ตรา + จัดโดย + สปอนเซอร์ */}
-          <div ref={creditRef} className="absolute inset-x-0 bottom-0 top-[70%] flex flex-col items-center justify-between pb-10" style={{ opacity: 0 }}>
-            <div className="flex items-center gap-5">
-              <Seal size={120} />
-              <div className="text-[28px] font-bold">จัดโดย {BRAND.organizer}</div>
+          <div ref={line1Ref} className="absolute left-0 top-[52%] h-[14px] w-full" style={{ background: `linear-gradient(90deg, ${ST.rose}, ${ST.cream})`, opacity: 0 }} />
+          <div ref={line2Ref} className="absolute left-0 top-[56%] h-[6px] w-full" style={{ background: `linear-gradient(90deg, ${ST.rose}, ${ST.cream})`, opacity: 0 }} />
+          {/* โลโก้ + แถวตราใต้ "2026" ชิดซ้ายแนวเดียวกับหัวข้อ (K-P1.12a · เว้น 40px) */}
+          <div className="absolute left-1/2 top-[44%] flex -translate-x-1/2 -translate-y-1/2 flex-col items-start gap-10">
+            <div ref={logoRef} style={{ opacity: 0 }}>
+              <EventLogo variant="white" width={920} priority />
             </div>
-            {sponsor && (
-              <div className="flex items-center gap-4 text-2xl text-muted">
-                <span>สนับสนุนโดย</span>
-                <SponsorLogo sponsor={sponsor} className="h-20" />
+            {/* ตรา + จัดโดย + สปอนเซอร์ */}
+            <div ref={creditRef} className="flex flex-col items-start gap-6" style={{ opacity: 0 }}>
+              <div className="flex items-center gap-5">
+                <Seal size={120} />
+                <div className="text-[28px] font-bold" style={{ color: ST.cream }}>จัดโดย {BRAND.organizer}</div>
               </div>
-            )}
+              {sponsor && (
+                <div className="flex items-center gap-4 text-2xl" style={{ color: ST.blush }}>
+                  <span>สนับสนุนโดย</span>
+                  <SponsorLogo sponsor={sponsor} className="h-20" />
+                </div>
+              )}
+            </div>
           </div>
         </>
       )}

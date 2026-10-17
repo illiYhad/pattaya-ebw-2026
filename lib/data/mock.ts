@@ -8,7 +8,7 @@ import { photoIdFor } from "@/lib/people";
 const NOW = () => new Date().toISOString();
 let seq = 0;
 const ctx: Ctx = { now: NOW, newId: (prefix) => `${prefix}-${Date.now().toString(36)}-${(++seq).toString(36)}` };
-const engine = () => new Engine(db, ctx);
+const engine = (actor?: string) => new Engine(db, actor ? { ...ctx, staffId: actor } : ctx);
 
 export const mockSource: DataSource = {
   async getCategories() { return [...db.categories].sort((a, b) => a.sort_order - b.sort_order); },
@@ -53,6 +53,17 @@ export const mockSource: DataSource = {
     if (!f) return null;
     return kind === "original" ? { bytes: f.original, mime: f.originalMime } : { bytes: f.cutout, mime: "image/png" };
   },
+
+  async getScoreSheets(categoryId) { return engine().getScoreSheets(categoryId); },
+  async saveScoreSheet(entryId, judgeNo, input, actor) { return engine(actor).saveScoreSheet(entryId, judgeNo, input); },
+  async clearScoreSheet(entryId, judgeNo, actor) { engine(actor).clearScoreSheet(entryId, judgeNo); },
+  async setScoreMethod(categoryId, method, actor) { return engine(actor).setScoreMethod(categoryId, method); },
+  async setTieDecision(categoryId, orderedEntryIds, actor) { return engine(actor).setTieDecision(categoryId, orderedEntryIds); },
+  async getResultBoard(categoryId) { return engine().getResultBoard(categoryId); },
+  async getPublicResults(categoryId) { return engine().getPublicResults(categoryId); },
+  async publishResults(categoryId, actor) { return engine(actor).publishResults(categoryId); },
+  async hideResults(categoryId, actor) { return engine(actor).hideResults(categoryId); },
+  async getScoreAudit(categoryId) { return engine().getScoreAudit(categoryId); },
 
   subscribe: subscribeDataChanges,
 };

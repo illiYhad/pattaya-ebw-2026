@@ -7,11 +7,14 @@ import { LightShell } from "@/components/site/LightShell";
 import { Ribbons } from "@/components/site/Ribbons";
 import { publicPhoto } from "@/lib/people";
 import { MEDIUM_LABEL, scoringLabel, sessionTimeLabel } from "@/lib/view";
+import { LiveRefresh } from "@/components/studio/LiveRefresh";
+import { PENDING_TEXT, fmtScore } from "@/lib/results-view";
 
-export const revalidate = 30;
+// คะแนน/อันดับเปลี่ยนทันทีเมื่อเปิด/ซ่อนผล → ไม่แคชหน้า (ซ่อนผลแล้วต้องไม่มีตัวเลขค้าง)
+export const dynamic = "force-dynamic";
 
 // โปรไฟล์ผู้แข่งแนวโอลิมปิก: หัวเข้มขอบโค้ง + แถบทอง/ชมพู · รูปวงกลมขอบทอง · เลข EBW · ชื่อไทย/อังกฤษ · ชิปประเภท
-// ส่วนผลคะแนน/อันดับแสดงเฉพาะเมื่อมีผลที่ประกาศแล้ว (ยังไม่มีในรุ่นนี้ → กล่องเดียว "รอประกาศผล")
+// ส่วนผลคะแนน/อันดับแสดงเฉพาะประเภทที่แอดมินกด "เปิดผล" แล้ว (K-P2c) · ยังไม่เปิด = "กำลังให้คะแนน" ไม่มีตัวเลข
 export default async function AthletePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [categories, competitors, entries, photos] = await Promise.all([data.getCategories(), data.getCompetitors(), data.getEntries(), data.getPhotos()]);
@@ -23,6 +26,14 @@ export default async function AthletePage({ params }: { params: Promise<{ id: st
     .filter((x): x is { entry: typeof x.entry; category: NonNullable<typeof x.category> } => !!x.category)
     .sort((a, b) => a.category.sort_order - b.category.sort_order);
   const photo = publicPhoto(photos, me);
+  // ผลสาธารณะรายประเภท (getPublicResults เท่านั้น): ยังไม่เปิดผล = pending ไม่มีตัวเลข
+  const resultOf = await Promise.all(mine.map(({ category }) => data.getPublicResults(category.id)));
+  const standingOf = mine.map(({ entry }, i) => {
+    const r = resultOf[i];
+    return r.status === "published" ? r.standings.find((x) => x.entry_id === entry.id) : undefined;
+  });
+  const publishedCount = resultOf.filter((r) => r.status === "published").length;
+  const bestRank = Math.min(...standingOf.map((s) => s?.rank ?? Infinity));
 
   return (
     <>
@@ -45,6 +56,7 @@ export default async function AthletePage({ params }: { params: Promise<{ id: st
       </div>
 
       <LightShell pull={0} className="pb-12 !pt-0">
+        <LiveRefresh />
         <div className="relative z-20 -mt-10 flex justify-center pb-4">
           <Avatar src={photo?.cutout_url} name={me.name_th} size="lg" round className="!h-40 !w-40 !text-4xl shadow-[0_10px_30px_rgba(18,15,46,0.3)] sm:!h-48 sm:!w-48" />
         </div>
@@ -64,15 +76,24 @@ export default async function AthletePage({ params }: { params: Promise<{ id: st
             <div className="mt-1 text-[13px] text-muted">เช็กอินแล้ว</div>
           </div>
           <div className="flex flex-col items-center rounded-[22px] bg-[#120F2E] px-1.5 py-3.5 text-ivory">
-            <div className="whitespace-nowrap text-xl font-semibold leading-tight text-gold sm:text-3xl">รอประกาศผล</div>
-            <div className="mt-1 text-[13px] text-[#C9C3E6]">คะแนน / อันดับ</div>
+            {Number.isFinite(bestRank) ? (
+              <>
+                <div className="num whitespace-nowrap text-4xl font-bold leading-none text-gold">อันดับ {bestRank}</div>
+                <div className="mt-1 text-[13px] text-[#C9C3E6]">ผลที่ประกาศแล้ว {publishedCount} ประเภท</div>
+              </>
+            ) : (
+              <>
+                <div className="whitespace-nowrap text-xl font-semibold leading-tight text-gold sm:text-3xl">{publishedCount > 0 ? "ประกาศผลแล้ว" : PENDING_TEXT}</div>
+                <div className="mt-1 text-[13px] text-[#C9C3E6]">คะแนน / อันดับ</div>
+              </>
+            )}
           </div>
         </section>
 
         <section className="mt-12 space-y-4">
           <h2 className="text-2xl font-semibold">ประเภทที่ลงแข่ง</h2>
           {mine.length === 0 && <p className="text-sm text-muted">ยังไม่ได้ลงประเภทใด</p>}
-          {mine.map(({ entry, category: c }) => (
+          {mine.map(({ entry, category: c }, i) => (
             <div key={entry.id} className="rounded-[28px] border border-[#E6DDEF] bg-white p-5">
               <div className="text-lg font-semibold"><Keep text={c.name} /></div>
               <div className="text-xs text-muted">{c.name_en}</div>
@@ -83,6 +104,19 @@ export default async function AthletePage({ params }: { params: Promise<{ id: st
                 <span>{scoringLabel(c)}</span>
                 <span>{entry.is_checked_in ? "✅ เช็กอินแล้ว" : "⬜ ยังไม่เช็กอิน"}</span>
               </div>
+              {resultOf[i].status === "published" ? (
+                standingOf[i] ? (
+                  <Link href={`/results/${c.code}`} className="mt-3 flex flex-wrap items-baseline gap-x-4 gap-y-1 rounded-2xl bg-[#120F2E] px-4 py-3 text-ivory">
+                    <span className="num text-2xl font-bold text-gold">อันดับ {standingOf[i]!.rank}</span>
+                    <span className="num text-xl font-semibold">{fmtScore(standingOf[i]!.score ?? 0)} <small className="text-xs font-normal text-[#C9C3E6]">คะแนนรวม</small></span>
+                    <span className="text-xs text-[#C9C3E6]">ดูผลทั้งประเภท</span>
+                  </Link>
+                ) : (
+                  <div className="mt-3 rounded-2xl bg-surface-2 px-4 py-2 text-sm text-[#4A3478]">ประกาศผลแล้ว · ยังไม่มีคะแนนของรายการนี้</div>
+                )
+              ) : (
+                <div className="mt-3 rounded-2xl bg-surface-2 px-4 py-2 text-sm text-[#4A3478]">{PENDING_TEXT}</div>
+              )}
             </div>
           ))}
         </section>

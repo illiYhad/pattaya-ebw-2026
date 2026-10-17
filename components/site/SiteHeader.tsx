@@ -3,6 +3,7 @@ import { EVENT } from "@/lib/event";
 import { Seal } from "@/components/brand/Brand";
 import { mockBlocked } from "@/lib/auth";
 import { UserBadge } from "@/components/auth/UserBadge";
+import { AdminLink } from "./AdminLink";
 import { Ribbons } from "./Ribbons";
 
 /** หัวเว็บทุกหน้า (ยกเว้น overlay ที่ซ่อนด้วย CSS): พื้นเข้มขอบล่างโค้ง + แถบทอง/ชมพู · ชื่อ EBW 2026 · เมนู · ผู้ใช้ + ตราสมาคม */
@@ -21,7 +22,7 @@ export function SiteHeader({ logoSrc }: { logoSrc?: string }) {
           {!mockBlocked && (
             <>
               <Link href="/checkin" className="flex min-h-11 items-center px-3 text-muted">เช็กอิน</Link>
-              <Link href="/admin" className="flex min-h-11 items-center px-3 text-muted">แอดมิน</Link>
+              <AdminLink />
               <Link href="/stream-hub" className="flex min-h-11 items-center px-3 text-muted">ห้องคุม</Link>
             </>
           )}

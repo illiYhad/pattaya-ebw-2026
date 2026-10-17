@@ -38,6 +38,13 @@ export function StreamHubClient({ channelKey, categories, competitors, entries }
   const [withStinger, setWithStinger] = useState(true);
   const [lowerThird, setLowerThird] = useState(true);
   const [hudText, setHudText] = useState("");
+  // ฉาก RESULT (โพเดียมของประเภท) / SCORE (ผู้แข่ง 1 คน) เลือกได้อิสระจากรายการของ channel — ค่าเริ่ม = ประเภท/รายการที่เลือกอยู่ด้านซ้าย
+  const [focus, setFocus] = useState<{ category_id: string; entry_id: string }>({ category_id: categoryId, entry_id: entryId });
+  useEffect(() => { setFocus({ category_id: categoryId, entry_id: entryId }); }, [categoryId, entryId]);
+  const focusEntries = useMemo(
+    () => entries.filter((e) => e.category_id === focus.category_id).map((e) => ({ e, comp: competitors.find((c) => c.id === e.competitor_id) })).filter((x) => x.comp).sort((a, b) => a.comp!.code.localeCompare(b.comp!.code)),
+    [entries, competitors, focus.category_id],
+  );
   const [bug, setBug] = useState<BugCorner>("bl");
   const [showKeys, setShowKeys] = useState(false);
   const { hotkeys, save } = useStreamHubHotkeys(DEFAULT_HOTKEYS);
@@ -61,9 +68,13 @@ export function StreamHubClient({ channelKey, categories, competitors, entries }
       busRef.current?.send(EVENTS.sceneChange, { scene });
       busRef.current?.send(EVENTS.brandBug, { corner: bug });
       busRef.current?.send(EVENTS.lowerThird, { show: lowerThird });
+      busRef.current?.send(EVENTS.resultFocus, focus);
     }, HEARTBEAT_MS);
     return () => clearInterval(t);
-  }, [scene, bug, lowerThird]);
+  }, [scene, bug, lowerThird, focus]);
+
+  // เปลี่ยนตัวเลือกประเภท/รายการของฉาก RESULT/SCORE → ส่งให้ overlay ทันที
+  useEffect(() => { busRef.current?.send(EVENTS.resultFocus, focus); }, [focus, current]);
 
   const setBugCorner = (corner: BugCorner) => { setBug(corner); busRef.current?.send(EVENTS.brandBug, { corner }); };
   const setLT = (show: boolean) => { setLowerThird(show); busRef.current?.send(EVENTS.lowerThird, { show }); };
@@ -175,6 +186,25 @@ export function StreamHubClient({ channelKey, categories, competitors, entries }
         <button className={`${btn} flex w-full items-center justify-center gap-2`} onClick={playStinger}>
           <Zap className="h-4 w-4" /> สติงเกอร์ <span className="text-[10px] text-muted">{hotkeys.stinger}</span>
         </button>
+
+        <div className="space-y-1 rounded bg-surface/60 p-2">
+          <div className="text-xs text-accent-2">ผลคะแนน (ฉาก RESULT / SCORE)</div>
+          <label className="block text-[11px] text-muted">ประเภท (RESULT = โพเดียมของประเภทนี้)
+            <select
+              className="mt-0.5 w-full rounded bg-bg p-1.5 text-sm"
+              value={focus.category_id}
+              onChange={(e) => setFocus({ category_id: e.target.value, entry_id: entries.find((x) => x.category_id === e.target.value)?.id ?? "" })}
+            >
+              {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </label>
+          <label className="block text-[11px] text-muted">ผู้แข่ง (SCORE = คะแนนคนนี้)
+            <select className="mt-0.5 w-full rounded bg-bg p-1.5 text-sm" value={focus.entry_id} onChange={(e) => setFocus((p) => ({ ...p, entry_id: e.target.value }))}>
+              {focusEntries.map(({ e, comp }) => <option key={e.id} value={e.id}>{comp!.code} {comp!.name_th}</option>)}
+            </select>
+          </label>
+          <p className="text-[10px] text-muted">คะแนนขึ้นจอเฉพาะประเภทที่แอดมินกด &quot;เปิดผล&quot; แล้ว · ก่อนนั้นจอแสดง &quot;กำลังให้คะแนน&quot;</p>
+        </div>
 
         <div className="space-y-1 rounded bg-surface/60 p-2">
           <div className="text-xs text-accent-2">ป้ายชื่อผู้แข่ง (ฉาก LIVE)</div>

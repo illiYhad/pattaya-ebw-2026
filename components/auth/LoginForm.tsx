@@ -33,7 +33,19 @@ export function LoginForm({ next }: { next: string }) {
       setError(error.message === "Invalid login credentials" ? "อีเมลหรือรหัสผ่านไม่ถูกต้อง" : error.message);
       return;
     }
-    router.replace(safeNext(next));
+    let dest = safeNext(next);
+    // ไม่ได้ระบุปลายทาง (ค่าเริ่มต้น /admin): สตาฟกรอกผลเข้า /admin ไม่ได้ → พาไปหน้ากรอกคะแนนแทน
+    if (dest === "/admin") {
+      try {
+        const sb = createBrowserSupabase();
+        const { data: { user } } = await sb.auth.getUser();
+        const { data: prof } = user ? await sb.from("staff_profiles").select("role").eq("id", user.id).maybeSingle() : { data: null };
+        if (prof?.role === "result_staff") dest = "/admin/score";
+      } catch {
+        /* อ่านบทบาทไม่ได้ → ใช้ปลายทางเดิม ให้ proxy ตัดสิน */
+      }
+    }
+    router.replace(dest);
     router.refresh();
   };
 

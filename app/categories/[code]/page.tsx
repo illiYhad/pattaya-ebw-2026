@@ -255,6 +255,7 @@ export default async function CategoryRulesPage({ params }: Params) {
 
       <Actions>
         <Btn href={`/athletes?cat=${c.code}`}>ดูผู้แข่งขันประเภทนี้</Btn>
+        <Btn href={`/results/${c.code}`} ghost>ดูผลการแข่งขัน</Btn>
         <Btn href="/categories" ghost>ประเภททั้งหมด</Btn>
         <Btn href="/register" ghost>สมัครแข่งขัน</Btn>
       </Actions>

@@ -1,0 +1,55 @@
+/* ==========================================================================
+   หน้าผลคะแนนคนดู (K-P2c) — อยู่ใน PosterPage (.pp) จึงใช้ตัวแปรสีชุดโปสเตอร์ต่อได้:
+   เขียวหัวเป็ด --teal-* · โรสโกลด์ --rose-* · ครีม --cream · เหรียญ 1/2/3 = โรสโกลด์สว่าง / เขียวหัวเป็ด / โรสโกลด์เข้ม (ไม่ใช้สีนอกชุด)
+   ========================================================================== */
+.pending{display:grid;justify-items:center;gap:10px;padding:34px 18px;text-align:center}
+.pending b{display:inline-block;padding:10px 40px 14px;border-radius:999px;font-size:30px;font-weight:600;line-height:1.2;color:#FFF6EF;
+  background:linear-gradient(180deg,#2A6B79,#103C48);border:2px solid var(--rose-300);box-shadow:inset 0 0 0 3px var(--teal-900),inset 0 0 0 4.5px var(--rose-400),0 6px 16px rgba(60,35,20,.3)}
+.pending p{margin:0;color:var(--teal-text);font-weight:500}
+.dots span{display:inline-block;width:9px;height:9px;margin:0 4px;border-radius:50%;background:var(--rose-500);animation:blink 1.4s infinite both}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+
+.podium{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.pod{position:relative;display:grid;justify-items:center;gap:4px;padding:18px 12px 16px;border-radius:22px;text-align:center;color:var(--ink);
+  background:rgba(255,250,246,.7);border:1.5px solid var(--line);box-shadow:inset 0 0 0 4px rgba(255,255,255,.35)}
+.pod .rk{display:grid;place-items:center;width:52px;height:52px;margin-bottom:2px;border-radius:50%;font-size:26px;font-weight:700;line-height:1;border:2px solid #FFF6EF;box-shadow:0 0 0 2px var(--rose-600),0 3px 8px rgba(40,20,10,.3)}
+.m1 .rk{color:#3A2A20;background:radial-gradient(circle at 35% 28%,#FFF6EF,#F1D9C8 45%,#D9B39C)}
+.m2 .rk{color:#FFF6EF;background:radial-gradient(circle at 35% 28%,#3A7D8B,#123F4B 80%)}
+.m3 .rk{color:#FFF6EF;background:radial-gradient(circle at 35% 28%,#B98A72,#8E6450 80%)}
+.pod .av{width:92px;height:92px;overflow:hidden;border-radius:50%;border:4px solid var(--rose-300);box-shadow:0 0 0 2px var(--rose-600)}
+.m1{border-color:var(--rose-400);background:linear-gradient(180deg,rgba(255,246,239,.95),rgba(241,217,200,.7))}
+.pod .cd{font-size:14px;font-weight:600;letter-spacing:.16em;color:var(--rose-700)}
+.pod .nm{font-size:19px;font-weight:600;line-height:1.3;color:var(--teal-text)}
+.pod .sh{font-size:14.5px;color:var(--ink-soft)}
+.pod .sc{margin-top:4px;font-size:44px;font-weight:700;line-height:1;color:var(--teal-text);font-variant-numeric:tabular-nums}
+.pod .sc small{display:block;margin-top:2px;font-size:13px;font-weight:500;letter-spacing:.1em;color:var(--ink-soft)}
+
+.list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.row{border-radius:16px;background:rgba(255,250,246,.62);border:1.5px solid var(--line);overflow:hidden}
+.row > summary{display:grid;grid-template-columns:40px 44px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 12px;cursor:pointer;list-style:none}
+.row > summary::-webkit-details-marker{display:none}
+.row .no{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;font-weight:700;font-size:16px;color:#FFF6EF;background:radial-gradient(circle at 40% 30%,#3A7D8B,#123F4B 75%);border:1.5px solid var(--rose-100)}
+.row .no.g1{color:#3A2A20;background:radial-gradient(circle at 35% 28%,#FFF6EF,#F1D9C8 45%,#D9B39C)}
+.row .no.g3{background:radial-gradient(circle at 35% 28%,#B98A72,#8E6450 80%)}
+.row .pic{width:44px;height:44px;overflow:hidden;border-radius:50%;border:2px solid var(--rose-300)}
+.row .who{min-width:0}
+.row .who b{display:block;font-size:16.5px;font-weight:600;line-height:1.3;color:var(--teal-text)}
+.row .who small{display:block;font-size:13px;color:var(--ink-soft)}
+.row .tot{font-size:24px;font-weight:700;color:var(--teal-text);font-variant-numeric:tabular-nums}
+.detail{padding:4px 14px 14px;border-top:1.5px dotted #C8B2A6;display:grid;gap:10px}
+.detail h3{margin:8px 0 0;font-size:14px;font-weight:600;color:var(--rose-700)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{padding:3px 12px;border-radius:999px;font-size:14.5px;background:rgba(255,250,246,.9);border:1.5px solid var(--line);color:var(--teal-text);font-variant-numeric:tabular-nums}
+.crit{margin:0;padding:0;list-style:none;display:grid;gap:4px}
+.crit li{display:flex;justify-content:space-between;gap:12px;font-size:14.5px;border-bottom:1px dotted #C8B2A6;padding-bottom:3px}
+.crit li b{color:var(--teal-text);font-variant-numeric:tabular-nums}
+.none{margin:0;padding:12px 14px;border-radius:14px;font-size:15px;color:var(--ink-soft);background:rgba(255,250,246,.5);border:1.5px dashed var(--line)}
+
+@container (min-width:640px){
+  .podium{grid-template-columns:repeat(3,minmax(0,1fr));align-items:end}
+  .podium .m1{order:2;padding-bottom:26px}.podium .m2{order:1}.podium .m3{order:3}
+  .pod .av{width:110px;height:110px}
+  .row > summary{grid-template-columns:44px 52px minmax(0,1fr) auto;padding:10px 16px}
+  .row .pic{width:52px;height:52px}
+}

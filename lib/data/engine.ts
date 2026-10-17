@@ -2,7 +2,8 @@ import type { Store } from "./defaults";
 import type { CategoryPatch, CompetitorInput } from "./source";
 import { normalizeKey, parseImportTable } from "./import-parse";
 import { photoIdFor } from "@/lib/people";
-import type { AthletePhoto, Category, Competitor, Criterion, Entry, EventConfig, ImportPreview, ImportRow, Sponsor } from "@/lib/types";
+import { checkScoreInput, computeBoard, DEFAULT_METHOD, TRIM_MIN_JUDGES, toPublicResults } from "./scoring";
+import type { AthletePhoto, Category, CategoryResultState, Competitor, Criterion, Entry, EventConfig, ImportPreview, ImportRow, PublicResults, ResultBoard, ScoreAudit, ScoreMethod, ScoreSheet, Sponsor } from "@/lib/types";
 
 // กติกาการเขียนทั้งหมดของระบบ ทำงานบน Store ในหน่วยความจำ · ผิดกติกา throw Error ข้อความไทย
 export type Ctx = { now: () => string; newId: (prefix: string) => string; staffId?: string };
@@ -21,6 +22,8 @@ export class Engine {
   private categoryOf(id: string) { return must(this.s.categories.find((c) => c.id === id), "ประเภท"); }
   private competitorOf(id: string) { return must(this.s.competitors.find((c) => c.id === id), "ผู้แข่ง"); }
   private entriesOf(competitorId: string) { return this.s.entries.filter((e) => e.competitor_id === competitorId); }
+  private sheetsOfCategory(categoryId: string) { return this.s.scoreSheets.filter((x) => x.category_id === categoryId); }
+  private hasSheets(entryId: string) { return this.s.scoreSheets.some((x) => x.entry_id === entryId); }
 
   /** รหัสผู้แข่งถัดไป EBW-### (ต่อจากเลขสูงสุดที่มี) */
   private nextCode(): string {
@@ -43,6 +46,12 @@ export class Engine {
 
   saveCategory(categoryId: string, patch: CategoryPatch): Category {
     const c = this.categoryOf(categoryId);
+    if (this.sheetsOfCategory(c.id).length) {
+      const critChanged = patch.criteria !== undefined && (patch.criteria.length !== c.criteria.length || patch.criteria.some((x, i) => x.max !== c.criteria[i].max));
+      if (critChanged || (patch.judge_count !== undefined && patch.judge_count !== c.judge_count)) {
+        throw new Error("ประเภทนี้มีคะแนนแล้ว ล้างคะแนนก่อนจึงแก้เกณฑ์/จำนวนกรรมการได้");
+      }
+    }
     if (patch.name !== undefined) {
       const name = patch.name.trim();
       if (!name) throw new Error("ต้องใส่ชื่อประเภท (ไทย)");
@@ -121,6 +130,7 @@ export class Engine {
 
   deleteCompetitor(competitorId: string) {
     this.competitorOf(competitorId);
+    if (this.entriesOf(competitorId).some((e) => this.hasSheets(e.id))) throw new Error("รายการนี้มีคะแนนแล้ว ล้างคะแนนก่อน");
     this.s.entries = this.s.entries.filter((e) => e.competitor_id !== competitorId);
     this.s.competitors = this.s.competitors.filter((c) => c.id !== competitorId);
   }
@@ -142,6 +152,7 @@ export class Engine {
 
   removeEntry(entryId: string) {
     must(this.s.entries.find((e) => e.id === entryId), "รายการที่ลงแข่ง");
+    if (this.hasSheets(entryId)) throw new Error("รายการนี้มีคะแนนแล้ว ล้างคะแนนก่อน");
     this.s.entries = this.s.entries.filter((e) => e.id !== entryId);
   }
 
@@ -215,6 +226,153 @@ export class Engine {
       }
     }
     return out;
+  }
+
+  // ---------- คะแนนกรรมการ (ใบ K-P2a) ----------
+
+  /** สถานะผลของประเภท — อ่านอย่างเดียว (ยังไม่มีแถว = ค่าเริ่มต้น) */
+  private peekState(categoryId: string): CategoryResultState {
+    return this.s.resultStates.find((x) => x.category_id === categoryId)
+      ?? { category_id: categoryId, method: DEFAULT_METHOD, published: false, tie_decisions: [] };
+  }
+  /** สถานะผลของประเภท — สร้างแถวถ้ายังไม่มี (ใช้ตอนเขียน) */
+  private stateOf(categoryId: string): CategoryResultState {
+    let st = this.s.resultStates.find((x) => x.category_id === categoryId);
+    if (!st) {
+      st = { category_id: categoryId, method: DEFAULT_METHOD, published: false, tie_decisions: [] };
+      this.s.resultStates.push(st);
+    }
+    return st;
+  }
+  private entryRow(entryId: string) { return must(this.s.entries.find((e) => e.id === entryId), "รายการที่ลงแข่ง"); }
+  private codeOfEntry(entryId: string) {
+    const e = this.s.entries.find((x) => x.id === entryId);
+    return this.s.competitors.find((c) => c.id === e?.competitor_id)?.code ?? entryId;
+  }
+  private audit(a: Omit<ScoreAudit, "id" | "at" | "by">) {
+    this.s.scoreAudit.push({ id: this.ctx.newId("au"), at: this.ctx.now(), by: this.ctx.staffId, ...a });
+  }
+  private assertEditable(categoryId: string) {
+    if (this.peekState(categoryId).published) throw new Error("ประกาศผลแล้ว ต้องกดซ่อนผลก่อนแก้คะแนน");
+  }
+  /** คะแนนเปลี่ยน → คำตัดสินเสมอเดิมใช้ไม่ได้แล้ว */
+  private resetTies(categoryId: string) {
+    const st = this.s.resultStates.find((x) => x.category_id === categoryId);
+    if (!st?.tie_decisions.length) return;
+    const before = st.tie_decisions.map((d) => d.entry_ids.map((id) => this.codeOfEntry(id)).join(" > ")).join(" | ");
+    st.tie_decisions = [];
+    this.audit({ category_id: categoryId, action: "tie_reset", before, after: "ล้างแล้ว" });
+  }
+  private describeSheet(x: ScoreSheet | undefined) {
+    if (!x) return undefined;
+    return x.criteria_scores ? `${x.total} (${x.criteria_scores.join(", ")})` : String(x.total);
+  }
+  private board(categoryId: string): ResultBoard {
+    const c = this.categoryOf(categoryId);
+    return computeBoard(c, this.s.entries, this.sheetsOfCategory(c.id), this.peekState(c.id), this.s.competitors);
+  }
+
+  getScoreSheets(categoryId: string): ScoreSheet[] {
+    this.categoryOf(categoryId);
+    return this.sheetsOfCategory(categoryId);
+  }
+
+  saveScoreSheet(entryId: string, judgeNo: number, input: { criteria_scores?: number[]; total?: number }): ScoreSheet {
+    const e = this.entryRow(entryId);
+    const cat = this.categoryOf(e.category_id);
+    if (!Number.isInteger(judgeNo) || judgeNo < 1 || judgeNo > cat.judge_count) throw new Error(`กรรมการคนที่ ${judgeNo} ไม่มีในประเภทนี้ (มี ${cat.judge_count} คน)`);
+    this.assertEditable(cat.id);
+    const checked = checkScoreInput(cat, input);
+    const prev = this.s.scoreSheets.find((x) => x.entry_id === e.id && x.judge_no === judgeNo);
+    const row: ScoreSheet = {
+      id: prev?.id ?? this.ctx.newId("ss"), entry_id: e.id, category_id: cat.id, judge_no: judgeNo,
+      ...(checked.criteria_scores ? { criteria_scores: checked.criteria_scores } : {}),
+      total: checked.total, updated_at: this.ctx.now(), updated_by: this.ctx.staffId,
+    };
+    if (prev) this.s.scoreSheets[this.s.scoreSheets.indexOf(prev)] = row; else this.s.scoreSheets.push(row);
+    this.resetTies(cat.id);
+    this.audit({ category_id: cat.id, entry_id: e.id, judge_no: judgeNo, action: "save", before: this.describeSheet(prev), after: this.describeSheet(row) });
+    return row;
+  }
+
+  clearScoreSheet(entryId: string, judgeNo: number) {
+    const e = this.entryRow(entryId);
+    this.assertEditable(e.category_id);
+    const prev = this.s.scoreSheets.find((x) => x.entry_id === e.id && x.judge_no === judgeNo);
+    if (!prev) throw new Error("ไม่พบใบคะแนนที่จะล้าง");
+    this.s.scoreSheets = this.s.scoreSheets.filter((x) => x !== prev);
+    this.resetTies(e.category_id);
+    this.audit({ category_id: e.category_id, entry_id: e.id, judge_no: judgeNo, action: "clear", before: this.describeSheet(prev) });
+  }
+
+  setScoreMethod(categoryId: string, method: ScoreMethod): CategoryResultState {
+    const cat = this.categoryOf(categoryId);
+    if (method !== "mean" && method !== "trimmed_mean") throw new Error("วิธีรวมคะแนนไม่ถูกต้อง");
+    if (method === "trimmed_mean" && cat.judge_count < TRIM_MIN_JUDGES) throw new Error("ตัดคะแนนสูงสุด-ต่ำสุดได้เมื่อกรรมการ 5 คนขึ้นไป");
+    this.assertEditable(cat.id);
+    const st = this.stateOf(cat.id);
+    if (st.method !== method) {
+      const before = st.method;
+      st.method = method;
+      this.audit({ category_id: cat.id, action: "method", before, after: method });
+      this.resetTies(cat.id);
+    }
+    return st;
+  }
+
+  /** กรรมการตัดสินกลุ่มที่คะแนนเท่ากัน — orderedEntryIds เรียงจากอันดับดีสุด · ต้องตรงกับกลุ่มที่ยังเสมออยู่ทุกตัวพอดี */
+  setTieDecision(categoryId: string, orderedEntryIds: string[]): CategoryResultState {
+    this.categoryOf(categoryId);
+    this.assertEditable(categoryId);
+    const ids = new Set(orderedEntryIds);
+    if (ids.size < 2 || ids.size !== orderedEntryIds.length) throw new Error("ต้องเลือกรายการที่คะแนนเท่ากันอย่างน้อย 2 รายการ และไม่ซ้ำกัน");
+    const tied = this.board(categoryId).standings.filter((x) => x.tie_unresolved);
+    const matches = [...new Set(tied.map((x) => x.rank))].some((r) => {
+      const g = tied.filter((x) => x.rank === r);
+      return g.length === ids.size && g.every((x) => ids.has(x.entry_id));
+    });
+    if (!matches) throw new Error("รายการที่เลือกไม่ตรงกับกลุ่มที่คะแนนเท่ากันอยู่ตอนนี้ (ต้องครบทุกรายการในกลุ่มพอดี)");
+    const st = this.stateOf(categoryId);
+    st.tie_decisions.push({ entry_ids: [...orderedEntryIds], decided_at: this.ctx.now(), decided_by: this.ctx.staffId });
+    this.audit({ category_id: categoryId, action: "tie_decision", after: orderedEntryIds.map((id) => this.codeOfEntry(id)).join(" > ") });
+    return st;
+  }
+
+  getResultBoard(categoryId: string): ResultBoard { return this.board(categoryId); }
+
+  getPublicResults(categoryId: string): PublicResults {
+    this.categoryOf(categoryId);
+    if (!this.peekState(categoryId).published) return { status: "pending" };
+    return toPublicResults(this.board(categoryId));
+  }
+
+  publishResults(categoryId: string): CategoryResultState {
+    this.categoryOf(categoryId);
+    const st = this.stateOf(categoryId);
+    if (st.published) return st;
+    const b = this.board(categoryId);
+    if (!b.can_publish) throw new Error(`ประกาศผลไม่ได้: ${b.warnings.join(" · ")}`);
+    st.published = true;
+    st.published_at = this.ctx.now();
+    st.published_by = this.ctx.staffId;
+    this.audit({ category_id: categoryId, action: "publish" });
+    return st;
+  }
+
+  hideResults(categoryId: string): CategoryResultState {
+    this.categoryOf(categoryId);
+    const st = this.stateOf(categoryId);
+    if (!st.published) return st;
+    st.published = false;
+    st.published_at = undefined;
+    st.published_by = undefined;
+    this.audit({ category_id: categoryId, action: "hide" });
+    return st;
+  }
+
+  getScoreAudit(categoryId: string): ScoreAudit[] {
+    this.categoryOf(categoryId);
+    return this.s.scoreAudit.filter((x) => x.category_id === categoryId);
   }
 
   // ---------- สปอนเซอร์ ----------

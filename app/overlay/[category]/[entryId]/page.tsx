@@ -41,7 +41,7 @@ export default async function OverlayPage({
   return (
     <>
       <style>{CLEAR_STYLE}</style>
-      <OverlayStage channelKey={expected} category={category} entry={entry} competitor={competitor} inCategory={inCategory} sponsors={sponsors} photos={photos} />
+      <OverlayStage channelKey={expected} category={category} entry={entry} competitor={competitor} inCategory={inCategory} sponsors={sponsors} photos={photos} directory={{ categories, competitors, entries }} />
     </>
   );
 }

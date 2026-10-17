@@ -1,4 +1,4 @@
-import type { AthletePhoto, Category, Competitor, Entry, EventConfig, Sponsor } from "@/lib/types";
+import type { AthletePhoto, Category, CategoryResultState, Competitor, Entry, EventConfig, ScoreAudit, ScoreSheet, Sponsor } from "@/lib/types";
 import { EVENT } from "@/lib/event";
 
 export type PhotoFiles = { original: Uint8Array; originalMime: string; cutout: Uint8Array };
@@ -12,6 +12,10 @@ export type Store = {
   photos: AthletePhoto[];
   /** ไฟล์รูปในหน่วยความจำ (mock) key = photo id */
   photoFiles: Map<string, PhotoFiles>;
+  scoreSheets: ScoreSheet[];
+  resultStates: CategoryResultState[];
+  /** เขียนต่อท้ายอย่างเดียว */
+  scoreAudit: ScoreAudit[];
 };
 
 export function defaultEventConfig(): EventConfig {
@@ -26,6 +30,9 @@ export const emptyStore = (): Store => ({
   eventConfig: defaultEventConfig(),
   photos: [],
   photoFiles: new Map(),
+  scoreSheets: [],
+  resultStates: [],
+  scoreAudit: [],
 });
 
 /** หัวข้อเกณฑ์ที่โปสเตอร์ไม่ให้คะแนนต่อข้อ (ไม่ใส่ max) → กรรมการให้คะแนนรวมเต็ม 100 ช่องเดียว */

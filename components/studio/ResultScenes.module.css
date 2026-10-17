@@ -1,0 +1,36 @@
+/* ==========================================================================
+   ฉาก RESULT โพเดียม + ฉาก SCORE (K-P2c) — ใช้คลาสพื้นฐาน (.fs .col .card .plate .chipDark .pill .note .avatar) จาก LiveArtwork.module.css ต่อ
+   สีชุดเดียวกัน · เหรียญ 1/2/3 = โรสโกลด์สว่าง / เขียวหัวเป็ด / โรสโกลด์เข้ม (ไม่ใช้สีนอกชุด)
+   ========================================================================== */
+.podRow{position:relative;z-index:2;display:flex;align-items:flex-start;justify-content:center;gap:40px;width:1560px}
+.pod{width:470px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:30px 28px 30px;text-align:center;color:#28201A}
+.pod1{margin-top:0;width:500px}
+.pod2{margin-top:70px}
+.pod3{margin-top:120px}
+.podRank{display:grid;place-items:center;width:96px;height:96px;margin-top:-76px;border-radius:50%;font-size:60px;font-weight:700;line-height:1;border:3px solid #FFF6EF;box-shadow:0 0 0 3px #9E7058,0 8px 18px rgba(0,0,0,.35)}
+.rank1{color:#3A2A20;background:radial-gradient(circle at 35% 28%,#FFF6EF,#F1D9C8 45%,#D9B39C)}
+.rank2{color:#FFF6EF;background:radial-gradient(circle at 35% 28%,#3A7D8B,#123F4B 80%)}
+.rank3{color:#FFF6EF;background:radial-gradient(circle at 35% 28%,#B98A72,#8E6450 80%)}
+.podCode{margin-top:6px;font-size:28px;font-weight:600;letter-spacing:.2em;color:#8E6450}
+.podName{font-size:44px;font-weight:700;line-height:1.2;color:#1D4652}
+.podShop{font-size:26px;color:#5B4A40}
+.podScore{margin-top:6px;font-size:110px;font-weight:700;line-height:1;color:#1D4652;font-variant-numeric:tabular-nums}
+.podScoreLabel{font-size:24px;font-weight:500;letter-spacing:.14em;color:#5B4A40}
+
+.scoreCard{display:flex;flex-direction:column;gap:30px;width:1380px;padding:34px 52px 40px}
+.scoreWho{display:flex;align-items:center;gap:44px}
+.scoreCode{font-size:34px;font-weight:600;letter-spacing:.22em;color:#8E6450}
+.scoreName{font-size:78px;font-weight:700;line-height:1.1;color:#1D4652}
+.scoreEn{font-size:34px;color:#5B4A40}
+.scoreShop{font-size:30px;color:#5B4A40}
+.scoreRow{display:flex;align-items:stretch;gap:24px}
+.judges{display:flex;flex:1;gap:18px}
+.judge{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:14px 10px;border-radius:26px;background:rgba(255,250,246,.9);border:2.5px solid #D2B3A1}
+.judge small{font-size:26px;font-weight:500;color:#5B4A40}
+.judge b{font-size:74px;font-weight:700;line-height:1;color:#1D4652;font-variant-numeric:tabular-nums}
+.totalBox{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:440px;padding:14px 40px 20px;border-radius:30px;color:#FFF6EF;
+  background:radial-gradient(120% 140% at 50% 0%,#2E6F7D 0,#174A57 45%,#0D3540 100%);border:2.5px solid #D9B39C;box-shadow:inset 0 0 0 4px #0D3540,inset 0 0 0 6px #C9A48F,0 10px 26px rgba(0,0,0,.35)}
+.totalBox small{font-size:28px;font-weight:500;letter-spacing:.16em;color:#F1D9C8}
+.totalBox b{font-size:150px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;text-shadow:0 3px 0 rgba(0,0,0,.3)}
+.rankPill{display:inline-flex;align-items:center;gap:12px;padding:6px 30px 8px;border-radius:999px;font-size:34px;font-weight:600;color:#3A2A20;background:linear-gradient(180deg,#FFF6EF,#F1D9C8);border:2px solid #D9B39C;box-shadow:0 0 0 2px #9E7058}
+.pendingBig{font-size:96px;padding:14px 90px 24px}
