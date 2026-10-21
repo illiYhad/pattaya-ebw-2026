@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { EVENT } from "@/lib/event";
 import { BRAND, EventMark, Seal } from "@/components/brand/Brand";
 
@@ -11,7 +12,15 @@ export function SiteFooter() {
           <Seal size={48} />
           <span>จัดโดย {BRAND.organizer}</span>
         </div>
-        <span className="w-full text-center text-[11px] sm:w-auto">ระบบโดย {EVENT.provider}</span>
+        <a
+          href="https://balehmstudio.com"
+          target="_blank"
+          rel="noopener"
+          className="flex w-full items-center justify-center gap-1.5 text-[11px] sm:w-auto"
+        >
+          <span>ระบบโดย {EVENT.provider}</span>
+          <Image src="/brand/bts-badge.png" alt="Balehm Tech Studio" width={28} height={28} />
+        </a>
       </div>
     </footer>
   );
