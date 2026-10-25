@@ -299,10 +299,16 @@ export function createSupabaseSource(getClient: GetClient = defaultClient, signP
       check(error);
     },
     async getPhotoFile(photoId, kind) {
-      const path = `${photoId}/${kind}`;
+      if (kind !== "original" && kind !== "cutout") return null;
+      // หาแถวรูปด้วย session ของผู้เรียกก่อน: RLS ซ่อนรูปที่ยังไม่ยินยอมจากคนทั่วไป (สตาฟเห็นทั้งหมด) → ไม่มีแถว = ไม่เซ็น URL ด้วย service role
+      const db = await getClient();
+      const { data: row, error: rowErr } = await db.from("photos").select("id").eq("id", photoId).maybeSingle();
+      check(rowErr);
+      if (!row) return null;
+      const path = `${(row as Row).id}/${kind}`;
       const url = await signPhoto(path);
       if (url) return { redirect: url };
-      const { data, error } = await (await getClient()).storage.from(PHOTO_BUCKET).download(path);
+      const { data, error } = await db.storage.from(PHOTO_BUCKET).download(path);
       if (error || !data) return null;
       return { bytes: new Uint8Array(await data.arrayBuffer()), mime: kind === "cutout" ? "image/png" : data.type || "image/jpeg" };
     },

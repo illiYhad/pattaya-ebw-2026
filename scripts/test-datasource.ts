@@ -225,6 +225,9 @@ await ok("รูป: อัปโหลด 2 ไฟล์ + แถวรูป �
   assert.ok(f1 && "bytes" in f1 && f1.bytes.length === 3);
   const signed = createSupabaseSource(async () => g.db as never, async (path) => `https://signed.example/${path}`);
   assert.deepEqual(await signed.getPhotoFile(p.id, "original"), { redirect: `https://signed.example/${p.id}/original` });
+  // กันเซ็น URL ให้รูปที่ไม่มีแถว (RLS ซ่อน/ไม่มีอยู่) หรือ kind แปลก ๆ
+  assert.equal(await signed.getPhotoFile("ph-ไม่มีรูปนี้", "original"), null);
+  assert.equal(await signed.getPhotoFile(p.id, "../secret" as never), null);
   await src.deletePhoto(p.id);
   assert.equal(g.files.size, 0);
   assert.equal((await src.getPhotos()).length, 0);
