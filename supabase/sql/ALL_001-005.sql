@@ -225,9 +225,18 @@ create policy staff_all on public.score_sheets for all to authenticated
 -- กันที่ DB (ไม่พึ่งแค่โค้ดแอป): ประเภทที่ประกาศผลแล้วห้ามเพิ่ม/แก้/ล้างใบคะแนน · updated_by ใช้อีเมลจาก JWT เสมอ (ไม่เชื่อค่าที่ client ส่ง)
 create or replace function public.guard_score_sheets() returns trigger
 language plpgsql security definer set search_path = public as $$
-declare cat text := case when tg_op = 'DELETE' then old.category_id else new.category_id end;
 begin
-  if exists (select 1 from public.result_states where category_id = cat and published) then
+  -- ใบคะแนนย้ายประเภท/ย้ายรายการไม่ได้ (กันเลี่ยงตัวเช็กด้านล่างด้วยการย้ายใบไปประเภทอื่น)
+  if tg_op = 'UPDATE' and (new.category_id is distinct from old.category_id or new.entry_id is distinct from old.entry_id) then
+    raise exception 'ย้ายใบคะแนนไปประเภท/รายการอื่นไม่ได้';
+  end if;
+  -- เช็กทั้งประเภทเดิมและประเภทใหม่ (INSERT ไม่มี old · DELETE ไม่มี new)
+  if exists (
+    select 1 from public.result_states
+    where published and category_id in (
+      case when tg_op = 'INSERT' then null else old.category_id end,
+      case when tg_op = 'DELETE' then null else new.category_id end)
+  ) then
     raise exception 'ประกาศผลแล้ว ต้องกดซ่อนผลก่อนแก้คะแนน';
   end if;
   if tg_op = 'DELETE' then return old; end if;
@@ -262,7 +271,7 @@ begin
     if tg_op = 'INSERT' and (new.published or new.method <> 'mean' or new.tie_decisions <> '[]'::jsonb) then
       raise exception 'ไม่มีสิทธิ์ — เฉพาะแอดมินประกาศผล/เปลี่ยนวิธีคิดคะแนน';
     end if;
-    if tg_op = 'UPDATE' and (new.published is distinct from old.published or new.method is distinct from old.method
+    if tg_op = 'UPDATE' and (new.category_id is distinct from old.category_id or new.published is distinct from old.published or new.method is distinct from old.method
        or new.published_at is distinct from old.published_at or new.published_by is distinct from old.published_by
        or (new.tie_decisions is distinct from old.tie_decisions and new.tie_decisions <> '[]'::jsonb)) then
       raise exception 'ไม่มีสิทธิ์ — เฉพาะแอดมินประกาศผล/เปลี่ยนวิธีคิดคะแนน/ตัดสินคะแนนเท่ากัน';
