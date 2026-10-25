@@ -30,6 +30,9 @@ same("/print/scoresheet/lip", ["admin", "result_staff"]);
 // ห้องคุม
 same("/stream-hub", ["admin", "stream_operator"]);
 
+// K-P3a: คิวงาน+สคริปต์ MC — สตาฟทั้ง 3 บทบาทอ่านได้ (อยู่ก่อนแถว /admin ในตาราง)
+same("/admin/run-of-show", ["admin", "result_staff", "stream_operator"]);
+
 // หน้าสาธารณะไม่มีข้อกำหนดสิทธิ์
 assert.equal(rolesForPath("/"), undefined);
 n++;

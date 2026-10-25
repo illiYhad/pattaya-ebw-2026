@@ -9,6 +9,7 @@ const TABS: AdminTab[] = [
   { href: "/admin/results", label: "ผล / เปิดผล" },
   { href: "/admin/import", label: "นำเข้ารายชื่อ" },
   { href: "/admin/photos", label: "ถ่ายรูป" },
+  { href: "/admin/run-of-show", label: "คิวงาน" },
   { href: "/admin/sponsors", label: "สปอนเซอร์" },
   { href: "/admin/settings", label: "ตั้งค่างาน" },
   { href: "/checkin", label: "เช็กอิน" },

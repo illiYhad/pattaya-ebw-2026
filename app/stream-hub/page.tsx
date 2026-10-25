@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { data } from "@/lib/data";
 import { getStaff, mockBlocked, BLOCKED_MESSAGE } from "@/lib/auth";
@@ -17,5 +18,10 @@ export default async function StreamHubPage() {
   const channelKey = process.env.CHANNEL_KEY;
   if (!channelKey) return <p className="text-live">ยังไม่ได้ตั้งค่า CHANNEL_KEY ใน .env.local (ดู .env.example)</p>;
   const [categories, competitors, entries] = await Promise.all([data.getCategories(), data.getCompetitors(), data.getEntries()]);
-  return <StreamHubClient channelKey={channelKey} categories={categories} competitors={competitors} entries={entries} />;
+  return (
+    <>
+      <Link href="/admin/run-of-show" className="no-print mb-3 inline-block rounded bg-surface px-3 py-1.5 text-sm text-muted hover:text-text">คิวงาน + สคริปต์พิธีกร</Link>
+      <StreamHubClient channelKey={channelKey} categories={categories} competitors={competitors} entries={entries} />
+    </>
+  );
 }
