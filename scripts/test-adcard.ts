@@ -1,8 +1,11 @@
 // ทดสอบตรรกะบัตรห้อยคอ (ใบ K-P5) — ข้อมูลบนบัตรต้องมาจากระบบเท่านั้น ไม่แต่งเอง
 // รัน: node --experimental-transform-types --import ./scripts/register-alias.mjs scripts/test-adcard.ts
 import assert from "node:assert/strict";
-import { backCategories, competitorCards, eventDateLabels, nameFontPx, CARD_ROLES, CARD_ROLE_ORDER } from "../lib/adcard.ts";
+import { CARD_PROGRAM, CARD_TEXT, backCategories, competitorCards, eventDateLabels, nameFontPx, CARD_ROLES, CARD_ROLE_ORDER } from "../lib/adcard.ts";
 import { buildSeedStore } from "../lib/data/seed.ts";
+import { SCHEDULE } from "../lib/event.ts";
+import { RUN_TIMES, normTime, startHHMM } from "../lib/schedule.ts";
+import { RUNOFSHOW_CUES } from "../lib/data/runofshow.ts";
 
 let n = 0;
 const ok = (name: string, fn: () => void) => {
@@ -61,6 +64,57 @@ ok("ชื่อยาวหดฟอนต์ลงตามความยา�
   assert.equal(nameFontPx("ก".repeat(20)), 17);
   assert.equal(nameFontPx("ก".repeat(30)), 14);
   assert.equal(nameFontPx("ก".repeat(40)), 12);
+});
+
+
+// ---------- K-P5a: เวลาบนบัตร = เวลาบนเว็บ = Run of Show (แหล่งเดียว lib/data/runofshow.ts) ----------
+const webTime = (label: string) => SCHEDULE.find((r) => r.label === label)?.time;
+const cardTime = (text: string) => CARD_PROGRAM.find((p) => p.text === text)?.time;
+
+ok("เวลาบนบัตรตรงต้นฉบับ Run of Show (ล็อกค่าที่พี่หยัดเคาะ — ห้ามเปลี่ยน)", () => {
+  assert.equal(cardTime("พิธีเปิดการแข่งขัน"), "08.00–09.00");
+  assert.equal(cardTime("มอบโล่ผู้จัดงาน ผู้สนับสนุน และกรรมการ"), "10.30–11.30");
+  assert.equal(cardTime("ประกาศผลและมอบถ้วยรางวัลทุกประเภท"), "15.30–17.00");
+  assert.equal(cardTime("พิธีปิดการแข่งขัน"), "17.30");
+  assert.equal(cardTime("สาธิตจาก Prime Speaker"), undefined);
+  assert.ok(CARD_TEXT.register.startsWith("ลงทะเบียน 07.30–08.30 น."));
+  assert.equal(CARD_TEXT.venueLine, "08.00–17.30 น.");
+});
+
+ok("เวลาบนเว็บ (SCHEDULE) ตรง Run of Show: ลงทะเบียน 07.30–08.30 · พิธีเปิด 08.00–09.00 · มอบโล่ 10.30–11.30", () => {
+  assert.equal(webTime("ลงทะเบียน"), "07.30–08.30");
+  assert.equal(webTime("พิธีเปิดงาน"), "08.00–09.00");
+  assert.equal(webTime("มอบโล่กรรมการ"), "10.30–11.30");
+});
+
+ok("เวลาที่บัตรกับเว็บมีร่วมกัน ต้องเท่ากันทุกรายการ", () => {
+  assert.equal(webTime("ลงทะเบียน"), /\d\d\.\d\d–\d\d\.\d\d/.exec(CARD_TEXT.register)![0]);
+  assert.equal(webTime("พิธีเปิดงาน"), cardTime("พิธีเปิดการแข่งขัน"));
+  assert.equal(webTime("มอบโล่กรรมการ"), cardTime("มอบโล่ผู้จัดงาน ผู้สนับสนุน และกรรมการ"));
+  assert.equal(SCHEDULE.find((r) => r.lines)?.time, cardTime("ประกาศผลและมอบถ้วยรางวัลทุกประเภท"));
+});
+
+ok("RUN_TIMES ทุกค่ามาจากคิวใน run-of-show จริง", () => {
+  const cue = (n: number) => normTime(RUNOFSHOW_CUES.find((c) => c.cue === n)!.time as string);
+  assert.equal(RUN_TIMES.plaque, cue(7));
+  assert.equal(RUN_TIMES.lunch, cue(8));
+  assert.equal(RUN_TIMES.speaker, cue(10));
+  assert.equal(RUN_TIMES.results, cue(11));
+  assert.equal(RUN_TIMES.closing, cue(12));
+  assert.equal(RUN_TIMES.opening, `${cue(1).split("–")[0]}–${cue(5).split("–")[1]}`);
+});
+
+ok("แถวเว็บเรียงตามเวลา และ start (HH:MM) ตรงต้นเวลาของแถว", () => {
+  const starts = SCHEDULE.map((r) => r.start);
+  assert.deepEqual(starts, [...starts].sort());
+  for (const r of SCHEDULE) assert.equal(r.start, startHHMM(normTime(r.time)));
+});
+
+ok("normTime รับรูปแบบจากต้นฉบับ (8.00–8.10 · 12:00–13.00 · 17:30)", () => {
+  assert.equal(normTime("8.00–8.10"), "08.00–08.10");
+  assert.equal(normTime("12:00–13.00"), "12.00–13.00");
+  assert.equal(normTime("17:30"), "17.30");
+  assert.throws(() => normTime("ไม่มีเวลา"));
 });
 
 console.log(`\nผ่านทั้งหมด ${n} ข้อ`);

@@ -1,3 +1,4 @@
+import { RUN_TIMES } from "@/lib/schedule";
 import type { AthletePhoto, Category, Competitor, Entry, Session } from "@/lib/types";
 
 // บัตรห้อยคอ (AD card) ใบ K-P5 — ตรรกะล้วน ไม่ import ฝั่ง server (ใช้ได้ทั้ง client component และสคริปต์ทดสอบ)
@@ -92,22 +93,22 @@ export function eventDateLabels(ymd: string | undefined): { en: string; th: stri
 
 /** กำหนดการหลังบัตร (คัดจากใบ K-P5 ตามสคริปต์พิธีกร) · time ว่าง = บรรทัดไม่มีเวลา */
 export const CARD_PROGRAM: { time?: string; text: string }[] = [
-  { time: "08.00–09.00", text: "พิธีเปิดการแข่งขัน" },
+  { time: RUN_TIMES.opening, text: "พิธีเปิดการแข่งขัน" },
   { text: "ภาคเช้า แข่งขัน 4 ประเภท" },
-  { time: "10.30–11.30", text: "มอบโล่ผู้จัดงาน ผู้สนับสนุน และกรรมการ" },
+  { time: RUN_TIMES.plaque, text: "มอบโล่ผู้จัดงาน ผู้สนับสนุน และกรรมการ" },
   { text: "ภาคบ่าย แข่งขัน 2 ประเภท" },
   { text: "สาธิตจาก Prime Speaker" },
-  { time: "15.30–17.00", text: "ประกาศผลและมอบถ้วยรางวัลทุกประเภท" },
-  { time: "17.30", text: "พิธีปิดการแข่งขัน" },
+  { time: RUN_TIMES.results, text: "ประกาศผลและมอบถ้วยรางวัลทุกประเภท" },
+  { time: RUN_TIMES.closing, text: "พิธีปิดการแข่งขัน" },
 ];
 
 export const CARD_TEXT = {
   titleTh: "การแข่งขันชิงแชมป์ภาคตะวันออก · แข่งขันสักคิ้ว สุขภาพความงาม",
-  venueLine: "08.00–17.30 น.",
+  venueLine: `${RUN_TIMES.venueHours} น.`,
   organizerLine: "จัดโดย สมาคมนักออกแบบตกแต่งคิ้วประเทศไทย (PMAT)",
   notice: "บัตรนี้ใช้เฉพาะบุคคล ห้ามโอนสิทธิ์ · โปรดติดบัตรตลอดเวลาในงาน",
   systemBy: "ระบบโดย Balehm Tech Studio",
-  register: "ลงทะเบียน 07.30–08.30 น. · @Asia Pattaya Hotel, Pattaya Thailand",
+  register: `ลงทะเบียน ${RUN_TIMES.registration} น. · @Asia Pattaya Hotel, Pattaya Thailand`,
   systemLive: "ระบบและไลฟ์โดย Balehm Tech Studio",
 } as const;
 

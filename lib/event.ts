@@ -1,3 +1,5 @@
+import { RUN_TIMES, startHHMM } from "@/lib/schedule";
+
 // ข้อมูลงานจริง — หน้าอื่นอ่านจากที่นี่ที่เดียว (ที่มา: DATA_EasternBeautyWellness_2026.md)
 export const EVENT = {
   /** บรรทัดรอง */
@@ -31,17 +33,19 @@ export type ScheduleItem = {
   art?: string;
 };
 
+// K-P5a: เวลาที่มีใน Run of Show ดึงจาก lib/schedule.ts (แหล่งเดียวกับบัตรห้อยคอ) — ห้ามพิมพ์เวลาซ้ำ · แถวที่ run-of-show ไม่มี (เริ่มแข่ง 10.00 · ของว่าง) คงค่าเดิมจากโปสเตอร์
+const row = (time: string) => ({ start: startHHMM(time), time });
+
 export const SCHEDULE: ScheduleItem[] = [
-  { start: "08:00", time: "08.00–08.30", label: "ลงทะเบียน", art: "01-shell.png" },
-  { start: "08:30", time: "08.30–09.00", label: "พิธีเปิดงาน", art: "02-mic.png" },
-  { start: "09:00", time: "09.00–10.00", label: "มอบโล่กรรมการ", art: "03-plaque.png" },
+  { ...row(RUN_TIMES.registration), label: "ลงทะเบียน", art: "01-shell.png" },
+  { ...row(RUN_TIMES.opening), label: "พิธีเปิดงาน", art: "02-mic.png" },
   { start: "10:00", time: "10.00", label: "เริ่มการแข่งขันทุกประเภท", art: "04-cosmetics.png" },
-  { start: "12:00", time: "12.00–13.00", label: "รับประทานอาหารบุฟเฟต์", art: "05-buffet.png" },
-  { start: "13:00", time: "13.00–15.00", label: "ชมโชว์ Prime Speaker", art: "06-chair.png" },
+  { ...row(RUN_TIMES.plaque), label: "มอบโล่กรรมการ", art: "03-plaque.png" },
+  { ...row(RUN_TIMES.lunch), label: "รับประทานอาหารบุฟเฟต์", art: "05-buffet.png" },
+  { ...row(RUN_TIMES.speaker), label: "ชมโชว์ Prime Speaker", art: "06-chair.png" },
   { start: "15:00", time: "15.00–15.30", label: "รับประทานอาหารว่าง", art: "07-teacup.png" },
   {
-    start: "15:30",
-    time: "15.30–17.00",
+    ...row(RUN_TIMES.results),
     label: "ประกาศผลรางวัลและมอบถ้วย พร้อมถ่ายรูปร่วมกัน และพิธีปิดงาน",
     lines: [["ประกาศผลรางวัล", "และมอบถ้วย"], ["พร้อมถ่ายรูปร่วมกัน ", "และพิธีปิดงาน"]],
   },
