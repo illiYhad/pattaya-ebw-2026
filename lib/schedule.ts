@@ -43,6 +43,8 @@ export const RUN_TIMES = {
   opening: span(1, 5),
   /** แข่งขันช่วงเช้า = คิว 6 (9.00–10.30) */
   competition: cueTime(6),
+  /** แข่งขันช่วงบ่าย = คิว 9 (13.00–14.30) */
+  afternoon: cueTime(9),
   /** มอบโล่ = คิว 7 */
   plaque: cueTime(7),
   /** พักกลางวัน = คิว 8 */
@@ -56,3 +58,16 @@ export const RUN_TIMES = {
   /** เวลางานทั้งวัน (หัวเอกสาร) */
   venueHours: headerTime(RUNOFSHOW_HEADER.timing),
 } as const;
+
+/** เวลาเริ่มของช่วง เช่น "09.00–10.30" → "09.00" */
+export function startOfRange(norm: string): string {
+  return norm.split("–")[0];
+}
+
+/** เริ่ม + ระยะเวลา (นาที) → { start_time, end_time, duration_min } แบบ "HH.MM" (ใช้ใน seed ประเภทแข่ง) */
+export function slotFrom(start: string, durationMin: number): { start_time: string; end_time: string; duration_min: number } {
+  const [h, m] = start.split(".").map(Number);
+  const total = h * 60 + m + durationMin;
+  const end = `${String(Math.floor(total / 60) % 24).padStart(2, "0")}.${String(total % 60).padStart(2, "0")}`;
+  return { start_time: start, end_time: end, duration_min: durationMin };
+}
