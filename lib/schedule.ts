@@ -41,6 +41,8 @@ export const RUN_TIMES = {
   registration: headerTime(RUNOFSHOW_HEADER.registration),
   /** พิธีเปิด = คิว 1–5 (8.00–9.00) */
   opening: span(1, 5),
+  /** แข่งขันช่วงเช้า = คิว 6 (9.00–10.30) */
+  competition: cueTime(6),
   /** มอบโล่ = คิว 7 */
   plaque: cueTime(7),
   /** พักกลางวัน = คิว 8 */

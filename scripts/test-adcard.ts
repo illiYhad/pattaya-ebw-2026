@@ -87,6 +87,16 @@ ok("เวลาบนเว็บ (SCHEDULE) ตรง Run of Show: ลงท�
   assert.equal(webTime("มอบโล่กรรมการ"), "10.30–11.30");
 });
 
+ok("K-P5b: เวลาเริ่มแข่งช่วงเช้าบนเว็บ = Run of Show คิว 6 (09.00–10.30) ไม่ใช่ 10.00", () => {
+  assert.equal(webTime("เริ่มการแข่งขันทุกประเภท"), "09.00–10.30");
+  assert.equal(RUN_TIMES.competition, normTime(RUNOFSHOW_CUES.find((c) => c.cue === 6)!.time as string));
+  assert.equal(SCHEDULE.find((r) => r.label === "เริ่มการแข่งขันทุกประเภท")?.start, "09:00");
+});
+
+ok("K-P5b: แถวของว่าง 15.00–15.30 คงไว้ (มาจากใบ K-P1.6 / โปสเตอร์ PMAT)", () => {
+  assert.equal(webTime("รับประทานอาหารว่าง"), "15.00–15.30");
+});
+
 ok("เวลาที่บัตรกับเว็บมีร่วมกัน ต้องเท่ากันทุกรายการ", () => {
   assert.equal(webTime("ลงทะเบียน"), /\d\d\.\d\d–\d\d\.\d\d/.exec(CARD_TEXT.register)![0]);
   assert.equal(webTime("พิธีเปิดงาน"), cardTime("พิธีเปิดการแข่งขัน"));
