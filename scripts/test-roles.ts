@@ -27,6 +27,9 @@ same("/admin/photos", ["admin", "result_staff"]);
 same("/checkin", ["admin", "result_staff"]);
 same("/print/scoresheet/lip", ["admin", "result_staff"]);
 
+// K-P5: บัตรห้อยคอ — แอดมินเท่านั้น (result_staff / stream_operator เข้าไม่ได้)
+same("/admin/ad-cards", ["admin"]);
+
 // ห้องคุม
 same("/stream-hub", ["admin", "stream_operator"]);
 

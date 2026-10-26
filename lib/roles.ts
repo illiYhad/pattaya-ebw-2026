@@ -7,6 +7,7 @@ export const PATH_ROLES: { prefix: string; roles: StaffRole[] }[] = [
   { prefix: "/admin/photos", roles: ["admin", "result_staff"] },
   { prefix: "/admin/score", roles: ["admin", "result_staff"] },
   { prefix: "/admin/run-of-show", roles: ["admin", "result_staff", "stream_operator"] }, // K-P3a: คิวงาน+สคริปต์ MC อ่านอย่างเดียว · อยู่ใต้ /admin เพื่อให้ matcher ของ proxy.ts คุมอยู่แล้ว
+  { prefix: "/admin/ad-cards", roles: ["admin"] }, // K-P5: บัตรห้อยคอ — แอดมินเท่านั้น (ระบุชัดแม้ /admin ครอบอยู่แล้ว)
   { prefix: "/admin", roles: ["admin"] },
   { prefix: "/checkin", roles: ["admin", "result_staff"] },
   { prefix: "/print/scoresheet", roles: ["admin", "result_staff"] },
