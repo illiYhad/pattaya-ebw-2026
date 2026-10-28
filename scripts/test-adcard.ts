@@ -170,4 +170,54 @@ ok("K-P4b: 005_seed.sql และส่วน 005 ใน ALL_001-005.sql ตร�
   }
 });
 
+ok("K-P5c: แถบบัตรกรรมการขึ้น JUDGE และ speaker ขึ้น PRIME SPEAKER (ห้ามเปลี่ยนคำ)", () => {
+  assert.equal(CARD_ROLES.judge.en, "JUDGE");
+  assert.equal(CARD_ROLES.speaker.en, "PRIME SPEAKER");
+});
+
+const SAMPLE = [
+  "\uFEFFrole\tsecond\tname_th\tname_en\tposter_file\tnote\tunknown_col",
+  "judge\tสักคิ้ว | สักปาก\tกรรมการ ตัวอย่าง\tJudge Sample\tD:/Posters/judge_1.jpg\tx\tz",
+  "vip\t\t\tVip Sample Only English\tD:/Posters/vip_1.png\t\t",
+  "robot\t\tชื่อ\tName\tp.jpg\t\t",
+  "speaker\t\t\t\tp2.jpg\t\t",
+  "",
+  "sponsor\tแบรนด์สมมติ\tผู้สนับสนุน ตัวอย่าง\tSponsor Sample\tp3.jpg\t\t",
+].join("\r\n");
+
+ok("K-P5c: นำเข้าไฟล์ — ตัด BOM · อ่านหัวตามชื่อ · แยก second ด้วย ' | ' · ข้าม role ผิด/ไม่มีชื่อ พร้อมเลขแถว", () => {
+  const r = parseOthersTable(SAMPLE);
+  assert.deepEqual(r.cards.map((c) => c.role), ["judge", "vip", "sponsor"]);
+  assert.deepEqual(r.cards[0].second, ["สักคิ้ว", "สักปาก"]);
+  assert.equal(r.cards[0].name_th, "กรรมการ ตัวอย่าง");
+  assert.equal(r.cards[1].name_th, "");
+  assert.equal(r.cards[1].name_en, "Vip Sample Only English");
+  assert.deepEqual(r.skipped.map((s) => s.row), [4, 5]);
+  assert.equal(new Set(r.cards.map((c) => c.id)).size, r.cards.length);
+});
+
+ok("K-P5c: ลำดับคอลัมน์สลับได้ · ไม่มีหัว role = ไม่นำเข้าและแจ้ง", () => {
+  const r = parseOthersTable("name_en\trole\nAnn Test\tjudge");
+  assert.equal(r.cards.length, 1);
+  assert.equal(r.cards[0].role, "judge");
+  const bad = parseOthersTable("a\tb\n1\t2");
+  assert.equal(bad.cards.length, 0);
+  assert.equal(bad.skipped.length, 1);
+});
+
+ok("K-P5c: จับคู่รูป — คอลัมน์ photo ก่อน poster_file · ไม่สนตัวพิมพ์/นามสกุล/ตัวคั่น path", () => {
+  const r = parseOthersTable("role\tname_en\tposter_file\tphoto\njudge\tA\tD:/x/Poster1.JPG\t\njudge\tB\tD:/x/p2.jpg\tface_b.png");
+  assert.equal(r.cards[0].photoKey, "Poster1.JPG");
+  assert.equal(r.cards[1].photoKey, "face_b.png");
+  assert.ok(matchPhotoKey("poster1.jpg", r.cards[0].photoKey));
+  assert.ok(matchPhotoKey("FACE_B.PNG", r.cards[1].photoKey));
+  assert.ok(!matchPhotoKey("other.jpg", r.cards[0].photoKey));
+  assert.ok(!matchPhotoKey("x.jpg", undefined));
+});
+
+ok("K-P5c: ชื่อยาวสุดหดฟอนต์ลง (ไม่ล้นกล่อง)", () => {
+  assert.ok(nameFontPx("วิปัศยาพร ติระพงศ์ประเสริฐ") < nameFontPx("สมชาย ใจดี"));
+  assert.ok(nameFontPx("Wipatsayaporn Tirapongprasert") <= 17);
+});
+
 console.log(`\nผ่านทั้งหมด ${n} ข้อ`);
