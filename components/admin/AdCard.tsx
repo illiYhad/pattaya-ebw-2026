@@ -1,5 +1,5 @@
 import { Cinzel } from "next/font/google";
-import { CARD_PROGRAM, CARD_ROLES, CARD_ROLE_ORDER, CARD_TEXT, nameFontPx, type BackCategory, type CardData } from "@/lib/adcard";
+import { CARD_PROGRAM, CARD_ROLES, CARD_ROLE_ORDER, CARD_TEXT, cardNames, nameFontPx, type BackCategory, type CardData } from "@/lib/adcard";
 import styles from "./AdCard.module.css";
 
 // บัตรห้อยคอ A6 (ใบ K-P5) · ออกแบบที่ 397×559px (= 105×148mm ที่ 96dpi) แล้วห่อด้วยกล่อง mm ตอนพิมพ์ (ดู AdCardsClient)
@@ -20,10 +20,10 @@ function Blank({ children }: { children: string }) {
   return <span className={styles.blank}>{children}</span>;
 }
 
-export function AdCardFront({ card, event }: { card: CardData; event: AdEventInfo }) {
+/** preview = พรีวิวบนจอเท่านั้น (แสดงเส้นประรอกรอกได้) · ตอนพิมพ์ห้ามส่ง preview → ไม่มีข้อความ placeholder บนบัตรจริง */
+export function AdCardFront({ card, event, preview = false }: { card: CardData; event: AdEventInfo; preview?: boolean }) {
   const role = CARD_ROLES[card.role];
-  const nameTh = card.name_th.trim();
-  const nameEn = card.name_en.trim();
+  const { main: nameMain, sub: nameSub } = cardNames(card);
   const second = card.second.map((s) => s.trim()).filter(Boolean);
   return (
     <div className={styles.card} data-face="front">
@@ -61,13 +61,13 @@ export function AdCardFront({ card, event }: { card: CardData; event: AdEventInf
           </div>
           <div className={styles.info}>
             <span className={styles.label}>NAME · ชื่อ</span>
-            <div className={styles.nameTh} style={{ fontSize: nameFontPx(nameTh) }}>
-              {nameTh || <Blank>ชื่อ - นามสกุล</Blank>}
+            <div className={styles.nameTh} style={{ fontSize: nameFontPx(nameMain) }}>
+              {nameMain || (preview ? <Blank>ชื่อ - นามสกุล</Blank> : null)}
             </div>
-            <div className={styles.nameEn}>{nameEn || <Blank>Name Surname</Blank>}</div>
+            {nameSub ? <div className={styles.nameEn}>{nameSub}</div> : preview && !nameMain ? <div className={styles.nameEn}><Blank>Name Surname</Blank></div> : null}
             <span className={`${styles.label} ${styles.labelGap}`}>{role.secondLabel}</span>
             <div className={styles.second}>
-              {second.length ? second.map((s, i) => <div key={i}>{s}</div>) : <Blank>…………………………</Blank>}
+              {second.length ? second.map((s, i) => <div key={i}>{s}</div>) : preview ? <Blank>…………………………</Blank> : null}
             </div>
             {card.shop && <div className={styles.shop}>{card.shop}</div>}
             {card.role === "competitor" && (

@@ -1,7 +1,7 @@
 // ทดสอบตรรกะบัตรห้อยคอ (ใบ K-P5) — ข้อมูลบนบัตรต้องมาจากระบบเท่านั้น ไม่แต่งเอง
 // รัน: node --experimental-transform-types --import ./scripts/register-alias.mjs scripts/test-adcard.ts
 import assert from "node:assert/strict";
-import { CARD_PROGRAM, CARD_TEXT, backCategories, competitorCards, eventDateLabels, nameFontPx, CARD_ROLES, CARD_ROLE_ORDER, parseOthersTable, matchPhotoKey } from "../lib/adcard.ts";
+import { CARD_PROGRAM, CARD_TEXT, backCategories, competitorCards, eventDateLabels, nameFontPx, CARD_ROLES, CARD_ROLE_ORDER, parseOthersTable, matchPhotoKey, cardNames } from "../lib/adcard.ts";
 import fs from "node:fs";
 import { buildSeedStore } from "../lib/data/seed.ts";
 import { DEFAULT_CATEGORIES } from "../lib/data/defaults.ts";
@@ -218,6 +218,25 @@ ok("K-P5c: จับคู่รูป — คอลัมน์ photo ก่อ
 ok("K-P5c: ชื่อยาวสุดหดฟอนต์ลง (ไม่ล้นกล่อง)", () => {
   assert.ok(nameFontPx("วิปัศยาพร ติระพงศ์ประเสริฐ") < nameFontPx("สมชาย ใจดี"));
   assert.ok(nameFontPx("Wipatsayaporn Tirapongprasert") <= 17);
+});
+
+ok("K-P5d: ไม่มีชื่อไทย = ใช้ชื่ออังกฤษเป็นชื่อหลัก ไม่ขึ้นบรรทัดอังกฤษซ้ำ · ไม่มีอังกฤษ = ไม่ขึ้นบรรทัดล่าง", () => {
+  assert.deepEqual(cardNames({ name_th: "", name_en: "Sample Only English" }), { main: "Sample Only English", sub: "" });
+  assert.deepEqual(cardNames({ name_th: "  ชื่อ ตัวอย่าง ", name_en: "" }), { main: "ชื่อ ตัวอย่าง", sub: "" });
+  assert.deepEqual(cardNames({ name_th: "ชื่อ ตัวอย่าง", name_en: "Sample Name" }), { main: "ชื่อ ตัวอย่าง", sub: "Sample Name" });
+  assert.deepEqual(cardNames({ name_th: " ", name_en: " " }), { main: "", sub: "" });
+});
+
+ok("K-P5d: ข้อความ placeholder บนบัตร (ชื่อ - นามสกุล / Name Surname / ……) อยู่หลังเงื่อนไข preview เท่านั้น — พื้นที่พิมพ์ไม่ส่ง preview", () => {
+  const src = fs.readFileSync(new URL("../components/admin/AdCard.tsx", import.meta.url), "utf8");
+  // เฉพาะหน้าหน้า (AdCardFront) — placeholder ของหน้าหลังไม่เกี่ยวกับช่องชื่อ
+  const front = src.slice(src.indexOf("export function AdCardFront"), src.indexOf("export function AdCardBack"));
+  const lines = front.split(/\r?\n/).filter((l) => /<Blank>/.test(l));
+  assert.equal(lines.length, 3);
+  for (const l of lines) assert.ok(l.includes("preview"), l.trim());
+  const client = fs.readFileSync(new URL("../components/admin/AdCardsClient.tsx", import.meta.url), "utf8");
+  assert.ok(client.includes("<AdCardFront card={c} event={event} preview />"));
+  assert.ok(client.includes("<AdCardFront card={c} event={event} /></div>"));
 });
 
 console.log(`\nผ่านทั้งหมด ${n} ข้อ`);

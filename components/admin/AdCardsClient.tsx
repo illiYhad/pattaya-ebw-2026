@@ -41,7 +41,7 @@ function Preview({ card, categories, event }: { card: CardData | undefined; cate
     <div className="flex flex-wrap gap-4">
       <div>
         <div className="mb-1 text-xs text-muted">ด้านหน้า</div>
-        <Scaled><AdCardFront card={c} event={event} /></Scaled>
+        <Scaled><AdCardFront card={c} event={event} preview /></Scaled>
       </div>
       <div>
         <div className="mb-1 text-xs text-muted">ด้านหลัง</div>

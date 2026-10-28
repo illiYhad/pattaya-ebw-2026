@@ -115,6 +115,13 @@ export const CARD_TEXT = {
 /** จำกัดความยาวไฟล์รูปที่เลือกเองในแท็บ "บุคคลอื่น" */
 export const MAX_PHOTO_BYTES = 8 * 1024 * 1024;
 
+/** K-P5d: ชื่อบนบัตร — ไม่มีชื่อไทย = ใช้ชื่ออังกฤษเป็นชื่อหลัก (ไม่ขึ้นบรรทัดไทย) · ไม่มีอังกฤษ = ไม่ขึ้นบรรทัดอังกฤษ */
+export function cardNames(card: Pick<CardData, "name_th" | "name_en">): { main: string; sub: string } {
+  const th = card.name_th.trim();
+  const en = card.name_en.trim();
+  return th ? { main: th, sub: en } : { main: en, sub: "" };
+}
+
 /** ขนาดฟอนต์ชื่อไทยตามความยาว — ชื่อยาวหดลง ไม่ล้นกล่อง */
 export function nameFontPx(name: string): number {
   const n = Array.from(name).length;
