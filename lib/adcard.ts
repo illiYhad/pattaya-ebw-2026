@@ -123,3 +123,65 @@ export function nameFontPx(name: string): number {
   if (n <= 36) return 14;
   return 12;
 }
+
+// ---------- K-P5c: นำเข้าไฟล์รายชื่อบุคคลอื่น (.tsv/.txt) · อ่านในเบราว์เซอร์อย่างเดียว ----------
+
+export type ImportedCard = CardData & {
+  /** กุญแจจับคู่รูป: คอลัมน์ photo ถ้ามี ไม่งั้นชื่อไฟล์ท้ายสุดของ poster_file */
+  photoKey?: string;
+};
+export type ImportResult = { cards: ImportedCard[]; skipped: { row: number; reason: string }[] };
+
+const ROLE_KEYS = new Set<string>(CARD_ROLE_ORDER);
+/** ชื่อไฟล์ท้ายสุดของ path (รองรับทั้ง \ และ /) */
+export const baseName = (p: string) => p.trim().split(/[\/]/).pop() ?? "";
+
+/** อ่านหัวคอลัมน์ตามชื่อ (ไม่ผูกลำดับ) · ตัด BOM · คอลัมน์ที่ไม่รู้จักข้าม · row = เลขบรรทัดในไฟล์ (หัว = 1) */
+export function parseOthersTable(text: string): ImportResult {
+  const lines = text.replace(/^﻿/, "").split(/\r?\n/);
+  const out: ImportResult = { cards: [], skipped: [] };
+  const head = (lines[0] ?? "").split("\t").map((h) => h.trim().toLowerCase());
+  const col = (k: string) => head.indexOf(k);
+  const [iRole, iSecond, iTh, iEn, iPoster, iPhoto] = ["role", "second", "name_th", "name_en", "poster_file", "photo"].map(col);
+  if (iRole < 0 || (iTh < 0 && iEn < 0)) {
+    out.skipped.push({ row: 1, reason: "ไม่พบหัวคอลัมน์ role และ name_th/name_en" });
+    return out;
+  }
+  const cell = (cells: string[], i: number) => (i < 0 ? "" : (cells[i] ?? "").trim());
+  lines.slice(1).forEach((line, idx) => {
+    if (!line.trim()) return;
+    const row = idx + 2;
+    const cells = line.split("\t");
+    const role = cell(cells, iRole).toLowerCase();
+    if (!ROLE_KEYS.has(role)) {
+      out.skipped.push({ row, reason: `role ไม่รู้จัก "${cell(cells, iRole)}"` });
+      return;
+    }
+    const name_th = cell(cells, iTh);
+    const name_en = cell(cells, iEn);
+    if (!name_th && !name_en) {
+      out.skipped.push({ row, reason: "ไม่มีชื่อ" });
+      return;
+    }
+    const key = cell(cells, iPhoto) || baseName(cell(cells, iPoster));
+    out.cards.push({
+      id: `i-${row}`,
+      role: role as CardRoleKey,
+      name_th,
+      name_en,
+      second: cell(cells, iSecond).split(" | ").map((s) => s.trim()).filter(Boolean),
+      photoKey: key || undefined,
+    });
+  });
+  return out;
+}
+
+/** จับคู่ชื่อไฟล์รูปกับ photoKey — เทียบชื่อเต็มก่อน (ไม่สนตัวพิมพ์) แล้วเทียบชื่อไม่รวมนามสกุล */
+export function matchPhotoKey(fileName: string, key: string | undefined): boolean {
+  if (!key) return false;
+  const f = baseName(fileName).normalize("NFC").toLowerCase();
+  const k = baseName(key).normalize("NFC").toLowerCase();
+  if (f === k) return true;
+  const stem = (s: string) => s.replace(/\.[a-z0-9]{2,5}$/i, "");
+  return stem(f) === stem(k);
+}

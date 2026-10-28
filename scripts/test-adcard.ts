@@ -1,7 +1,7 @@
 // ทดสอบตรรกะบัตรห้อยคอ (ใบ K-P5) — ข้อมูลบนบัตรต้องมาจากระบบเท่านั้น ไม่แต่งเอง
 // รัน: node --experimental-transform-types --import ./scripts/register-alias.mjs scripts/test-adcard.ts
 import assert from "node:assert/strict";
-import { CARD_PROGRAM, CARD_TEXT, backCategories, competitorCards, eventDateLabels, nameFontPx, CARD_ROLES, CARD_ROLE_ORDER } from "../lib/adcard.ts";
+import { CARD_PROGRAM, CARD_TEXT, backCategories, competitorCards, eventDateLabels, nameFontPx, CARD_ROLES, CARD_ROLE_ORDER, parseOthersTable, matchPhotoKey } from "../lib/adcard.ts";
 import fs from "node:fs";
 import { buildSeedStore } from "../lib/data/seed.ts";
 import { DEFAULT_CATEGORIES } from "../lib/data/defaults.ts";

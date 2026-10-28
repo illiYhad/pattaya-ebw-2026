@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AdCardBack, AdCardFront, type AdEventInfo } from "@/components/admin/AdCard";
-import { CARD_ROLES, CARD_ROLE_ORDER, MAX_PHOTO_BYTES, type BackCategory, type CardData, type CardRoleKey } from "@/lib/adcard";
+import { CARD_ROLES, CARD_ROLE_ORDER, MAX_PHOTO_BYTES, matchPhotoKey, parseOthersTable, type BackCategory, type CardData, type CardRoleKey, type ImportedCard } from "@/lib/adcard";
 
 // หน้า /admin/ad-cards (ใบ K-P5) · พิมพ์ด้วย print CSS ของเบราว์เซอร์ (Save as PDF ได้) · ไม่บันทึกอะไรลงฐานข้อมูล
 const CARD_W = 397;
@@ -61,7 +61,9 @@ export function AdCardsClient({ competitors, categories, backCategories, event }
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [focusId, setFocusId] = useState<string | undefined>(competitors[0]?.id);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
-  const [others, setOthers] = useState<CardData[]>([]);
+  const [others, setOthers] = useState<ImportedCard[]>([]);
+  const [roleFilter, setRoleFilter] = useState<"" | CardRoleKey>("");
+  const [focusOther, setFocusOther] = useState<string | undefined>();
   const [msg, setMsg] = useState("");
   const [printList, setPrintList] = useState<CardData[] | null>(null);
   const seq = useRef(0);
@@ -130,7 +132,37 @@ export function AdCardsClient({ competitors, categories, backCategories, event }
     setDraft((d) => ({ ...emptyDraft(), role: d.role }));
   };
 
+  // ---------- K-P5c: นำเข้าไฟล์รายชื่อ + รูปหลายไฟล์ (อ่านในเบราว์เซอร์ ไม่ส่งขึ้นเซิร์ฟเวอร์) ----------
+  const onImportFile = async (file: File | undefined) => {
+    if (!file) return;
+    const r = parseOthersTable(await file.text());
+    const base = seq.current;
+    seq.current += r.cards.length;
+    setOthers((o) => [...o, ...r.cards.map((c, i) => ({ ...c, id: `o-${base + i + 1}` }))]);
+    const rows = r.skipped.map((s) => `แถว ${s.row} (${s.reason})`).join(" · ");
+    setMsg(`นำเข้า ${r.cards.length} ใบ · ข้าม ${r.skipped.length}${rows ? ` — ${rows}` : ""}`);
+  };
+
+  const onPhotos = (files: FileList | null) => {
+    const list = Array.from(files ?? []).filter((f) => f.type.startsWith("image/") && f.size <= MAX_PHOTO_BYTES);
+    if (!list.length) return setMsg("ไม่พบไฟล์รูปที่ใช้ได้ (ต้องเป็นรูป ≤ 8 MB)");
+    const hit = new Map<string, string>();
+    const matched = new Set<string>();
+    for (const f of list) {
+      const owners = others.filter((o) => matchPhotoKey(f.name, o.photoKey));
+      if (!owners.length) continue;
+      const u = URL.createObjectURL(f);
+      urls.current.add(u);
+      owners.forEach((o) => hit.set(o.id, u));
+      matched.add(f.name);
+    }
+    setOthers((o) => o.map((c) => (hit.has(c.id) ? { ...c, photo: hit.get(c.id) } : c)));
+    setMsg(`จับคู่รูปได้ ${hit.size} ใบ จาก ${list.length} ไฟล์ · ไฟล์ที่ไม่ตรงกับใคร ${list.length - matched.size}`);
+  };
+
+  const shownOthers = roleFilter ? others.filter((o) => o.role === roleFilter) : others;
   const draftCard = toCard(draft, "draft");
+  const previewOther = others.find((o) => o.id === focusOther);
   const secondLabel = CARD_ROLES[draft.role].secondLabel;
 
   return (
@@ -213,16 +245,31 @@ export function AdCardsClient({ competitors, categories, backCategories, event }
                   {draft.photo && <button className={btn2Cls} onClick={() => setDraft({ ...draft, photo: undefined })}>เอารูปออก</button>}
                 </div>
               </div>
+              <div className="grid gap-2 rounded bg-surface/60 p-3 text-sm sm:grid-cols-2">
+                <label className="flex flex-col text-xs text-muted">นำเข้าไฟล์รายชื่อ (.tsv/.txt) · อ่านในเบราว์เซอร์เท่านั้น
+                  <input type="file" accept=".tsv,.txt,text/tab-separated-values,text/plain" className="text-xs" onChange={(e) => { void onImportFile(e.target.files?.[0]); e.target.value = ""; }} />
+                </label>
+                <label className="flex flex-col text-xs text-muted">เลือกรูปหลายไฟล์ (จับคู่ด้วยชื่อไฟล์)
+                  <input type="file" accept="image/*" multiple className="text-xs" onChange={(e) => { onPhotos(e.target.files); e.target.value = ""; }} />
+                </label>
+              </div>
               <div className="flex flex-wrap items-center gap-2 text-sm">
-                <button className={btnCls} disabled={!others.length} onClick={() => startPrint(others)}>พิมพ์ทั้งรายการ ({others.length})</button>
-                <button className={btn2Cls} disabled={!others.length} onClick={() => setOthers([])}>ล้างรายการ</button>
+                <label className="flex items-center gap-2 text-xs text-muted">กรองบทบาท
+                  <select className={field} value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as "" | CardRoleKey)}>
+                    <option value="">ทั้งหมด ({others.length})</option>
+                    {CARD_ROLE_ORDER.map((k) => <option key={k} value={k}>{CARD_ROLES[k].en} ({others.filter((o) => o.role === k).length})</option>)}
+                  </select>
+                </label>
+                <button className={btnCls} disabled={!shownOthers.length} onClick={() => startPrint(shownOthers)}>{roleFilter ? `พิมพ์ทั้งหมดของบทบาทนี้ (${shownOthers.length})` : `พิมพ์ทั้งรายการ (${others.length})`}</button>
+                <button className={btn2Cls} disabled={!others.length} onClick={() => { setOthers([]); setRoleFilter(""); setFocusOther(undefined); }}>ล้างรายการ</button>
               </div>
               {others.length > 0 && (
                 <ul className="divide-y divide-white/5 rounded bg-surface/60 text-sm">
-                  {others.map((o) => (
+                  {shownOthers.map((o) => (
                     <li key={o.id} className="flex items-center gap-3 px-3 py-2">
                       <span className="shrink-0 rounded bg-surface-2 px-2 py-0.5 text-xs">{CARD_ROLES[o.role].en}</span>
-                      <span className="min-w-0 flex-1 truncate">{o.name_th || o.name_en}</span>
+                      <button className="min-w-0 flex-1 truncate text-left" onClick={() => setFocusOther(o.id)} aria-label={`ดูตัวอย่าง ${o.name_th || o.name_en}`}>{o.name_th || o.name_en}</button>
+                      <span className={`shrink-0 text-xs ${o.photo ? "text-accent" : "text-muted"}`}>{o.photo ? "มีรูป" : "ไม่มีรูป"}</span>
                       <button className="text-xs underline" onClick={() => startPrint([o])}>พิมพ์</button>
                       <button className="text-xs underline" onClick={() => setOthers(others.filter((x) => x.id !== o.id))}>เอาออก</button>
                     </li>
@@ -230,7 +277,10 @@ export function AdCardsClient({ competitors, categories, backCategories, event }
                 </ul>
               )}
             </div>
-            <Preview card={draftCard} categories={backCategories} event={event} />
+            <div className="space-y-2">
+              {previewOther && <button className={btn2Cls} onClick={() => setFocusOther(undefined)}>กลับไปดูใบที่กรอก</button>}
+              <Preview card={previewOther ?? draftCard} categories={backCategories} event={event} />
+            </div>
           </div>
         )}
       </div>
