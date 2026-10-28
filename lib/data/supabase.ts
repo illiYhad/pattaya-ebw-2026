@@ -138,7 +138,7 @@ async function loadStore(db: SupabaseClient, categoryId?: string): Promise<Store
     fetchAll(db, "competitors", "code"),
     fetchAll(db, "entries", "id", eq),
     fetchAll(db, "sponsors", "sequence"),
-    fetchAll(db, "photos", "id"),
+    fetchAll(db, "ebw_photos", "id"),
     fetchAll(db, "score_sheets", "id", eq),
     fetchAll(db, "result_states", "category_id", eq),
     db.from("event_config").select("*").eq("id", 1).maybeSingle(),
@@ -162,7 +162,7 @@ const PLANS: Record<string, Plan> = {
   competitors: { key: "competitors", table: "competitors", pk: "id", from: fromCompetitor as Plan["from"] },
   entries: { key: "entries", table: "entries", pk: "id", from: fromEntry as Plan["from"] },
   sponsors: { key: "sponsors", table: "sponsors", pk: "id", from: fromSponsor as Plan["from"] },
-  photos: { key: "photos", table: "photos", pk: "id", from: fromPhoto as Plan["from"] },
+  photos: { key: "photos", table: "ebw_photos", pk: "id", from: fromPhoto as Plan["from"] },
   resultStates: { key: "resultStates", table: "result_states", pk: "category_id", from: fromState as Plan["from"] },
   scoreSheets: { key: "scoreSheets", table: "score_sheets", pk: "id", from: fromSheet as Plan["from"] },
 };
@@ -260,7 +260,7 @@ export function createSupabaseSource(getClient: GetClient = defaultClient, signP
       check(error);
       return toEventConfig((data ?? undefined) as Row | undefined);
     },
-    getPhotos: () => read("photos", "id", toPhoto),
+    getPhotos: () => read("ebw_photos", "id", toPhoto),
 
     saveCategory: (categoryId, patch) => mutate((e) => e.saveCategory(categoryId, patch)),
 
@@ -302,7 +302,7 @@ export function createSupabaseSource(getClient: GetClient = defaultClient, signP
       if (kind !== "original" && kind !== "cutout") return null;
       // หาแถวรูปด้วย session ของผู้เรียกก่อน: RLS ซ่อนรูปที่ยังไม่ยินยอมจากคนทั่วไป (สตาฟเห็นทั้งหมด) → ไม่มีแถว = ไม่เซ็น URL ด้วย service role
       const db = await getClient();
-      const { data: row, error: rowErr } = await db.from("photos").select("id").eq("id", photoId).maybeSingle();
+      const { data: row, error: rowErr } = await db.from("ebw_photos").select("id").eq("id", photoId).maybeSingle();
       check(rowErr);
       if (!row) return null;
       const path = `${(row as Row).id}/${kind}`;
@@ -320,9 +320,9 @@ export function createSupabaseSource(getClient: GetClient = defaultClient, signP
     setTieDecision: (categoryId, orderedEntryIds, actor) => mutate((e) => e.setTieDecision(categoryId, orderedEntryIds), actor),
     getResultBoard: (categoryId) => view((e) => e.getResultBoard(categoryId), categoryId),
     async getPublicResults(categoryId) {
-      // คนทั่วไปอ่านคะแนนดิบไม่ได้ (RLS) — ฟังก์ชัน public_published_results คืนข้อมูลเฉพาะประเภทที่ประกาศแล้ว · ยังไม่ประกาศ = ไม่มีตัวเลขใด ๆ
+      // คนทั่วไปอ่านคะแนนดิบไม่ได้ (RLS) — ฟังก์ชัน ebw_public_published_results คืนข้อมูลเฉพาะประเภทที่ประกาศแล้ว · ยังไม่ประกาศ = ไม่มีตัวเลขใด ๆ
       const db = await getClient();
-      const { data, error } = await db.rpc("public_published_results", { p_category: categoryId });
+      const { data, error } = await db.rpc("ebw_public_published_results", { p_category: categoryId });
       check(error);
       if (!data) return { status: "pending" };
       const pub = data as { state: Row; sheets: Row[] };

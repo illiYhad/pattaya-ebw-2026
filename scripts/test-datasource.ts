@@ -70,7 +70,7 @@ function fakeDb(deny: (op: string, table: string) => boolean = () => false) {
   const db = {
     from,
     rpc: async (name: string, args: { p_category: string }) => {
-      assert.equal(name, "public_published_results");
+      assert.equal(name, "ebw_public_published_results");
       const st = rows("result_states").find((r) => r.category_id === args.p_category && r.published === true);
       if (!st) return { data: null, error: null };
       return { data: { state: st, sheets: rows("score_sheets").filter((s) => s.category_id === args.p_category) }, error: null };

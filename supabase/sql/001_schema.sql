@@ -50,7 +50,7 @@ create table if not exists public.entries (
 create index if not exists entries_category_idx on public.entries (category_id);
 
 -- คนละไม่เกิน 2 ประเภท (บังคับที่ DB)
-create or replace function public.enforce_max_two_entries() returns trigger
+create or replace function public.ebw_enforce_max_two_entries() returns trigger
 language plpgsql as $$
 begin
   if (select count(*) from public.entries where competitor_id = new.competitor_id and id <> new.id) >= 2 then
@@ -60,10 +60,10 @@ begin
 end $$;
 drop trigger if exists entries_max_two on public.entries;
 create trigger entries_max_two before insert or update of competitor_id on public.entries
-  for each row execute function public.enforce_max_two_entries();
+  for each row execute function public.ebw_enforce_max_two_entries();
 
 -- ---------- รูป / สปอนเซอร์ / ตั้งค่างาน ----------
-create table if not exists public.photos (
+create table if not exists public.ebw_photos (
   id text primary key,
   person_key text not null,
   original_url text not null,

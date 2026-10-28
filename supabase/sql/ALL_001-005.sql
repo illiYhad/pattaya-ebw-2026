@@ -1,4 +1,6 @@
--- ALL_001-005.sql · K-P4 · รวม 001–005 เรียงลำดับ · รันซ้ำได้ · วางไฟล์นี้ไฟล์เดียวใน SQL Editor ได้เลย (ไม่รวม 006 เพราะต้องเติมอีเมลก่อน)
+-- ALL_001-005.sql · K-P4/K-P6 · รวม 001–005 เรียงลำดับ · รันซ้ำได้ · วางไฟล์นี้ไฟล์เดียวใน SQL Editor ได้เลย (ไม่รวม 006 เพราะต้องเติมอีเมลก่อน)
+-- รันบน Supabase boonsai-apartment (ใช้ร่วม) · ห้ามมี DROP ใด ๆ กับตาราง/ฟังก์ชันของบุญใส (มีเพียง drop policy/trigger ของตารางพัทยาเอง)
+-- ตาราง/ฟังก์ชัน/policy บน storage ที่อาจชนกับบุญใสถูกเติมหน้า ebw_ แล้ว (ebw_photos · ebw_* functions · "ebw athlete photos staff ...")
 
 -- ======================= 001_schema.sql =======================
 -- 001_schema.sql · K-P4 · EBW 2026 (พัทยา) · รันซ้ำได้ (if not exists) · ⛔ โคลท์เขียนให้เท่านั้น ไม่ได้รัน — พี่หยัดวางใน SQL Editor
@@ -53,7 +55,7 @@ create table if not exists public.entries (
 create index if not exists entries_category_idx on public.entries (category_id);
 
 -- คนละไม่เกิน 2 ประเภท (บังคับที่ DB)
-create or replace function public.enforce_max_two_entries() returns trigger
+create or replace function public.ebw_enforce_max_two_entries() returns trigger
 language plpgsql as $$
 begin
   if (select count(*) from public.entries where competitor_id = new.competitor_id and id <> new.id) >= 2 then
@@ -63,10 +65,10 @@ begin
 end $$;
 drop trigger if exists entries_max_two on public.entries;
 create trigger entries_max_two before insert or update of competitor_id on public.entries
-  for each row execute function public.enforce_max_two_entries();
+  for each row execute function public.ebw_enforce_max_two_entries();
 
 -- ---------- รูป / สปอนเซอร์ / ตั้งค่างาน ----------
-create table if not exists public.photos (
+create table if not exists public.ebw_photos (
   id text primary key,
   person_key text not null,
   original_url text not null,
@@ -136,20 +138,20 @@ create index if not exists score_audit_category_idx on public.score_audit (categ
 -- ======================= 002_rls.sql =======================
 -- 002_rls.sql · K-P4 · RLS ตามบทบาท · รันซ้ำได้ · รันหลัง 001
 -- สิทธิ์ตรงกับ requireRole ในโค้ด: admin = ทุกอย่าง · result_staff = กรอก/ล้างคะแนน + เช็กอิน + รูป · stream_operator = อ่านข้อมูลสาธารณะเท่านั้น
--- คะแนนรายกรรมการ / audit / ผลที่ยังไม่ประกาศ: คนไม่ล็อกอินอ่านไม่ได้ (ผลที่ประกาศแล้วอ่านผ่านฟังก์ชัน public_published_results เท่านั้น)
+-- คะแนนรายกรรมการ / audit / ผลที่ยังไม่ประกาศ: คนไม่ล็อกอินอ่านไม่ได้ (ผลที่ประกาศแล้วอ่านผ่านฟังก์ชัน ebw_public_published_results เท่านั้น)
 
-create or replace function public.current_staff_role() returns text
+create or replace function public.ebw_current_staff_role() returns text
 language sql stable security definer set search_path = public as $$
   select role from public.staff_profiles where id = auth.uid()
 $$;
-revoke all on function public.current_staff_role() from public;
-grant execute on function public.current_staff_role() to anon, authenticated;
+revoke all on function public.ebw_current_staff_role() from public;
+grant execute on function public.ebw_current_staff_role() to anon, authenticated;
 
 alter table public.staff_profiles enable row level security;
 alter table public.categories enable row level security;
 alter table public.competitors enable row level security;
 alter table public.entries enable row level security;
-alter table public.photos enable row level security;
+alter table public.ebw_photos enable row level security;
 alter table public.sponsors enable row level security;
 alter table public.event_config enable row level security;
 alter table public.score_sheets enable row level security;
@@ -159,7 +161,7 @@ alter table public.score_audit enable row level security;
 -- ===== staff_profiles: อ่านของตัวเอง / แอดมินอ่านทั้งหมด · ไม่มีใครเขียนผ่านเว็บ (พี่หยัดเพิ่มด้วย SQL ใน 006)
 drop policy if exists staff_read on public.staff_profiles;
 create policy staff_read on public.staff_profiles for select to authenticated
-  using (id = auth.uid() or public.current_staff_role() = 'admin');
+  using (id = auth.uid() or public.ebw_current_staff_role() = 'admin');
 
 -- ===== อ่านสาธารณะ (หน้าเว็บ)
 drop policy if exists public_read on public.categories;
@@ -176,29 +178,29 @@ create policy public_read on public.event_config for select using (true);
 -- ===== แอดมินจัดการข้อมูลหลัก
 drop policy if exists admin_write on public.categories;
 create policy admin_write on public.categories for all to authenticated
-  using (public.current_staff_role() = 'admin') with check (public.current_staff_role() = 'admin');
+  using (public.ebw_current_staff_role() = 'admin') with check (public.ebw_current_staff_role() = 'admin');
 drop policy if exists admin_write on public.competitors;
 create policy admin_write on public.competitors for all to authenticated
-  using (public.current_staff_role() = 'admin') with check (public.current_staff_role() = 'admin');
+  using (public.ebw_current_staff_role() = 'admin') with check (public.ebw_current_staff_role() = 'admin');
 drop policy if exists admin_write on public.sponsors;
 create policy admin_write on public.sponsors for all to authenticated
-  using (public.current_staff_role() = 'admin') with check (public.current_staff_role() = 'admin');
+  using (public.ebw_current_staff_role() = 'admin') with check (public.ebw_current_staff_role() = 'admin');
 drop policy if exists admin_write on public.event_config;
 create policy admin_write on public.event_config for all to authenticated
-  using (public.current_staff_role() = 'admin') with check (public.current_staff_role() = 'admin');
+  using (public.ebw_current_staff_role() = 'admin') with check (public.ebw_current_staff_role() = 'admin');
 
 -- ===== entries: แอดมินเพิ่ม/ลบ/แก้ · result_staff แก้ได้เฉพาะ "เช็กอิน" (ตัวกันอยู่ที่ trigger ด้านล่าง)
 drop policy if exists admin_write on public.entries;
 create policy admin_write on public.entries for all to authenticated
-  using (public.current_staff_role() = 'admin') with check (public.current_staff_role() = 'admin');
+  using (public.ebw_current_staff_role() = 'admin') with check (public.ebw_current_staff_role() = 'admin');
 drop policy if exists staff_checkin on public.entries;
 create policy staff_checkin on public.entries for update to authenticated
-  using (public.current_staff_role() = 'result_staff') with check (public.current_staff_role() = 'result_staff');
+  using (public.ebw_current_staff_role() = 'result_staff') with check (public.ebw_current_staff_role() = 'result_staff');
 
-create or replace function public.guard_entries_update() returns trigger
+create or replace function public.ebw_guard_entries_update() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
-  if public.current_staff_role() = 'result_staff'
+  if public.ebw_current_staff_role() = 'result_staff'
      and (new.competitor_id is distinct from old.competitor_id or new.category_id is distinct from old.category_id) then
     raise exception 'ไม่มีสิทธิ์ — สตาฟกรอกผลแก้ได้เฉพาะเช็กอิน';
   end if;
@@ -206,24 +208,24 @@ begin
 end $$;
 drop trigger if exists entries_guard_update on public.entries;
 create trigger entries_guard_update before update on public.entries
-  for each row execute function public.guard_entries_update();
+  for each row execute function public.ebw_guard_entries_update();
 
 -- ===== รูป: คนทั่วไปเห็นเฉพาะรายที่ยินยอม · admin/result_staff เห็นและจัดการทั้งหมด
-drop policy if exists public_read_consented on public.photos;
-create policy public_read_consented on public.photos for select using (consent = true);
-drop policy if exists staff_all on public.photos;
-create policy staff_all on public.photos for all to authenticated
-  using (public.current_staff_role() in ('admin', 'result_staff'))
-  with check (public.current_staff_role() in ('admin', 'result_staff'));
+drop policy if exists public_read_consented on public.ebw_photos;
+create policy public_read_consented on public.ebw_photos for select using (consent = true);
+drop policy if exists staff_all on public.ebw_photos;
+create policy staff_all on public.ebw_photos for all to authenticated
+  using (public.ebw_current_staff_role() in ('admin', 'result_staff'))
+  with check (public.ebw_current_staff_role() in ('admin', 'result_staff'));
 
 -- ===== คะแนนรายกรรมการ: เฉพาะ admin + result_staff (อ่าน/กรอก/ล้าง)
 drop policy if exists staff_all on public.score_sheets;
 create policy staff_all on public.score_sheets for all to authenticated
-  using (public.current_staff_role() in ('admin', 'result_staff'))
-  with check (public.current_staff_role() in ('admin', 'result_staff'));
+  using (public.ebw_current_staff_role() in ('admin', 'result_staff'))
+  with check (public.ebw_current_staff_role() in ('admin', 'result_staff'));
 
 -- กันที่ DB (ไม่พึ่งแค่โค้ดแอป): ประเภทที่ประกาศผลแล้วห้ามเพิ่ม/แก้/ล้างใบคะแนน · updated_by ใช้อีเมลจาก JWT เสมอ (ไม่เชื่อค่าที่ client ส่ง)
-create or replace function public.guard_score_sheets() returns trigger
+create or replace function public.ebw_guard_score_sheets() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
   -- ใบคะแนนย้ายประเภท/ย้ายรายการไม่ได้ (กันเลี่ยงตัวเช็กด้านล่างด้วยการย้ายใบไปประเภทอื่น)
@@ -245,29 +247,29 @@ begin
 end $$;
 drop trigger if exists score_sheets_guard on public.score_sheets;
 create trigger score_sheets_guard before insert or update or delete on public.score_sheets
-  for each row execute function public.guard_score_sheets();
+  for each row execute function public.ebw_guard_score_sheets();
 
 -- ===== สถานะผล: อ่าน/เพิ่ม/แก้ได้ทั้ง admin + result_staff (Engine สร้างแถว/ล้างคำตัดสินเสมอเมื่อคะแนนเปลี่ยน) · ลบได้เฉพาะแอดมิน
 -- แต่ result_staff เปลี่ยน ประกาศผล / วิธีคิด / คำตัดสินคะแนนเท่ากัน ไม่ได้ (trigger) — ล้างคำตัดสินให้ว่างได้อย่างเดียว
 drop policy if exists staff_all on public.result_states;
 drop policy if exists staff_read on public.result_states;
 create policy staff_read on public.result_states for select to authenticated
-  using (public.current_staff_role() in ('admin', 'result_staff'));
+  using (public.ebw_current_staff_role() in ('admin', 'result_staff'));
 drop policy if exists staff_insert on public.result_states;
 create policy staff_insert on public.result_states for insert to authenticated
-  with check (public.current_staff_role() in ('admin', 'result_staff'));
+  with check (public.ebw_current_staff_role() in ('admin', 'result_staff'));
 drop policy if exists staff_update on public.result_states;
 create policy staff_update on public.result_states for update to authenticated
-  using (public.current_staff_role() in ('admin', 'result_staff'))
-  with check (public.current_staff_role() in ('admin', 'result_staff'));
+  using (public.ebw_current_staff_role() in ('admin', 'result_staff'))
+  with check (public.ebw_current_staff_role() in ('admin', 'result_staff'));
 drop policy if exists admin_delete on public.result_states;
 create policy admin_delete on public.result_states for delete to authenticated
-  using (public.current_staff_role() = 'admin');
+  using (public.ebw_current_staff_role() = 'admin');
 
-create or replace function public.guard_result_states() returns trigger
+create or replace function public.ebw_guard_result_states() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
-  if public.current_staff_role() is distinct from 'admin' then
+  if public.ebw_current_staff_role() is distinct from 'admin' then
     if tg_op = 'INSERT' and (new.published or new.method <> 'mean' or new.tie_decisions <> '[]'::jsonb) then
       raise exception 'ไม่มีสิทธิ์ — เฉพาะแอดมินประกาศผล/เปลี่ยนวิธีคิดคะแนน';
     end if;
@@ -281,13 +283,13 @@ begin
 end $$;
 drop trigger if exists result_states_guard on public.result_states;
 create trigger result_states_guard before insert or update on public.result_states
-  for each row execute function public.guard_result_states();
+  for each row execute function public.ebw_guard_result_states();
 
 -- ===== audit: เขียนต่อท้ายได้ (admin + result_staff) · แอดมินอ่านได้ · ไม่มี update/delete
 drop policy if exists staff_insert on public.score_audit;
 create policy staff_insert on public.score_audit for insert to authenticated
-  with check (public.current_staff_role() in ('admin', 'result_staff'));
-create or replace function public.guard_score_audit() returns trigger
+  with check (public.ebw_current_staff_role() in ('admin', 'result_staff'));
+create or replace function public.ebw_guard_score_audit() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
   new.actor := coalesce(auth.jwt() ->> 'email', new.actor);
@@ -295,13 +297,13 @@ begin
 end $$;
 drop trigger if exists score_audit_actor on public.score_audit;
 create trigger score_audit_actor before insert on public.score_audit
-  for each row execute function public.guard_score_audit();
+  for each row execute function public.ebw_guard_score_audit();
 drop policy if exists admin_read on public.score_audit;
 create policy admin_read on public.score_audit for select to authenticated
-  using (public.current_staff_role() = 'admin');
+  using (public.ebw_current_staff_role() = 'admin');
 
 -- ===== ผลที่ "ประกาศแล้ว" สำหรับหน้าสาธารณะ/โอเวอร์เลย์: คืนเฉพาะประเภทที่ published เท่านั้น (ยังไม่ประกาศ = null · ไม่มีตัวเลขหลุด)
-create or replace function public.public_published_results(p_category text) returns jsonb
+create or replace function public.ebw_public_published_results(p_category text) returns jsonb
 language sql stable security definer set search_path = public as $$
   select jsonb_build_object(
     'state', jsonb_build_object('category_id', rs.category_id, 'method', rs.method, 'published', rs.published,
@@ -314,8 +316,8 @@ language sql stable security definer set search_path = public as $$
   from public.result_states rs
   where rs.category_id = p_category and rs.published = true
 $$;
-revoke all on function public.public_published_results(text) from public;
-grant execute on function public.public_published_results(text) to anon, authenticated;
+revoke all on function public.ebw_public_published_results(text) from public;
+grant execute on function public.ebw_public_published_results(text) to anon, authenticated;
 
 -- ======================= 003_realtime.sql =======================
 -- 003_realtime.sql · K-P4 · เพิ่มตารางที่หน้าจอผล/โอเวอร์เลย์ฟัง (lib/data/live.ts: entries · competitors · sponsors) เข้า supabase_realtime · รันซ้ำได้
@@ -332,25 +334,25 @@ begin
 end $$;
 
 -- ======================= 004_storage.sql =======================
--- 004_storage.sql · K-P4 · bucket รูปผู้แข่ง (private) · รันซ้ำได้ · รันหลัง 002 (ใช้ฟังก์ชัน current_staff_role)
+-- 004_storage.sql · K-P4 · bucket รูปผู้แข่ง (private) · รันซ้ำได้ · รันหลัง 002 (ใช้ฟังก์ชัน ebw_current_staff_role)
 -- ไฟล์อยู่ที่ <photo id>/original และ <photo id>/cutout · คนทั่วไปเข้าผ่านเซิร์ฟเวอร์ (service role เซ็น URL หลังตรวจ consent) · สตาฟอ่าน/เขียนตามนโยบายด้านล่าง
 insert into storage.buckets (id, name, public)
 values ('athlete-photos', 'athlete-photos', false)
 on conflict (id) do update set public = false;
 
-drop policy if exists "athlete photos staff read" on storage.objects;
-create policy "athlete photos staff read" on storage.objects for select to authenticated
-  using (bucket_id = 'athlete-photos' and public.current_staff_role() in ('admin', 'result_staff'));
-drop policy if exists "athlete photos staff insert" on storage.objects;
-create policy "athlete photos staff insert" on storage.objects for insert to authenticated
-  with check (bucket_id = 'athlete-photos' and public.current_staff_role() in ('admin', 'result_staff'));
-drop policy if exists "athlete photos staff update" on storage.objects;
-create policy "athlete photos staff update" on storage.objects for update to authenticated
-  using (bucket_id = 'athlete-photos' and public.current_staff_role() in ('admin', 'result_staff'))
-  with check (bucket_id = 'athlete-photos' and public.current_staff_role() in ('admin', 'result_staff'));
-drop policy if exists "athlete photos staff delete" on storage.objects;
-create policy "athlete photos staff delete" on storage.objects for delete to authenticated
-  using (bucket_id = 'athlete-photos' and public.current_staff_role() in ('admin', 'result_staff'));
+drop policy if exists "ebw athlete photos staff read" on storage.objects;
+create policy "ebw athlete photos staff read" on storage.objects for select to authenticated
+  using (bucket_id = 'athlete-photos' and public.ebw_current_staff_role() in ('admin', 'result_staff'));
+drop policy if exists "ebw athlete photos staff insert" on storage.objects;
+create policy "ebw athlete photos staff insert" on storage.objects for insert to authenticated
+  with check (bucket_id = 'athlete-photos' and public.ebw_current_staff_role() in ('admin', 'result_staff'));
+drop policy if exists "ebw athlete photos staff update" on storage.objects;
+create policy "ebw athlete photos staff update" on storage.objects for update to authenticated
+  using (bucket_id = 'athlete-photos' and public.ebw_current_staff_role() in ('admin', 'result_staff'))
+  with check (bucket_id = 'athlete-photos' and public.ebw_current_staff_role() in ('admin', 'result_staff'));
+drop policy if exists "ebw athlete photos staff delete" on storage.objects;
+create policy "ebw athlete photos staff delete" on storage.objects for delete to authenticated
+  using (bucket_id = 'athlete-photos' and public.ebw_current_staff_role() in ('admin', 'result_staff'));
 
 -- ======================= 005_seed.sql =======================
 -- 005_seed.sql · K-P4 · 7 ประเภทตั้งต้น + ตั้งค่างานตั้งต้น (สร้างจาก lib/data/defaults.ts) · รันซ้ำได้: มีแล้วไม่เขียนทับ (on conflict do nothing)
