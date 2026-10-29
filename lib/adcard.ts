@@ -4,7 +4,7 @@ import type { AthletePhoto, Category, Competitor, Entry, Session } from "@/lib/t
 // บัตรห้อยคอ (AD card) ใบ K-P5 — ตรรกะล้วน ไม่ import ฝั่ง server (ใช้ได้ทั้ง client component และสคริปต์ทดสอบ)
 // ข้อความคงที่ทุกบรรทัดคัดจากใบงาน K-P5 (ซึ่งมาจากสคริปต์พิธีกร RUNOFSHOW_EBW2026) · ข้อมูลคนและประเภทมาจากระบบเท่านั้น ห้ามแต่งเพิ่ม
 
-export type CardRoleKey = "competitor" | "judge" | "organizer" | "vip" | "speaker" | "sponsor";
+export type CardRoleKey = "competitor" | "judge" | "organizer" | "director" | "vip" | "speaker" | "sponsor";
 
 export type CardRole = {
   en: string;
@@ -16,12 +16,14 @@ export type CardRole = {
   secondLabel: string;
 };
 
-export const CARD_ROLE_ORDER: CardRoleKey[] = ["competitor", "judge", "organizer", "vip", "speaker", "sponsor"];
+export const CARD_ROLE_ORDER: CardRoleKey[] = ["competitor", "judge", "organizer", "director", "vip", "speaker", "sponsor"];
 
 export const CARD_ROLES: Record<CardRoleKey, CardRole> = {
   competitor: { en: "COMPETITOR", th: "ผู้เข้าร่วมแข่งขัน", bg: "#1C8A94", fg: "#FFFFFF", secondLabel: "CATEGORY · ประเภทที่แข่ง" },
   judge: { en: "JUDGE", th: "คณะกรรมการตัดสิน", bg: "#F2CC2E", fg: "#1E1A08", secondLabel: "CATEGORY · ประเภทที่ตัดสิน" },
   organizer: { en: "ORGANIZER", th: "คณะผู้จัดงาน", bg: "#8A5A3C", fg: "#FFFFFF", secondLabel: "POSITION · ตำแหน่ง" },
+  // K-P5e: DIRECTOR (โปสเตอร์จริงเขียน DIRECTOR) · สีชมพูกุหลาบ ไม่ซ้ำ role อื่น · ป้ายไทย/ช่องรองเป็นข้อความร่างของโคลท์
+  director: { en: "DIRECTOR", th: "ผู้อำนวยการ", bg: "#A8325E", fg: "#FFFFFF", secondLabel: "POSITION · ตำแหน่ง" },
   vip: { en: "VIP", th: "ผู้ทรงคุณวุฒิ / แขกผู้มีเกียรติ", bg: "#4B2A7B", fg: "#FFFFFF", secondLabel: "ORGANIZATION · หน่วยงาน / ประเทศ" },
   speaker: { en: "PRIME SPEAKER", th: "ผู้สาธิตบนเวที", bg: "#C4553A", fg: "#FFFFFF", secondLabel: "TECHNIQUE · เทคนิคที่สาธิต" },
   sponsor: { en: "SPONSOR", th: "ผู้ให้การสนับสนุน", bg: "#2E6FB7", fg: "#FFFFFF", secondLabel: "COMPANY · บริษัท / แบรนด์" },

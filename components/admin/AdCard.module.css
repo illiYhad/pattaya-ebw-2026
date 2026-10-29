@@ -181,7 +181,10 @@
 .chip_afternoon { background: #e2b193; }
 .chip_submit { background: #cfe3e4; }
 
-.roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 10px; }
+/* K-P5e: 7 ช่อง = แถวบน 4 + แถวล่าง 3 (12 คอลัมน์) */
+.roles { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; margin-bottom: 10px; }
+.roles > .roleCell { grid-column: span 4; }
+.roles > .roleCell:nth-child(-n+4) { grid-column: span 3; }
 .roleCell { border-radius: 3px; padding: 4px 4px; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 34px; }
 .roleCell b { font-size: 10.5px; letter-spacing: 0.04em; line-height: 1.1; }
 .roleCell span { font-size: 7.5px; margin-top: 1px; line-height: 1.2; }

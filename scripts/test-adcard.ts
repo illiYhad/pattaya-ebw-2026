@@ -55,8 +55,10 @@ ok("วันงาน → ป้ายอังกฤษ/ไทย (ปี ค.
   assert.deepEqual(eventDateLabels("2026-13-01"), { en: "", th: "" });
 });
 
-ok("ตารางบทบาทครบ 6 ตามสคริปต์พิธีกร", () => {
-  assert.deepEqual(CARD_ROLE_ORDER, ["competitor", "judge", "organizer", "vip", "speaker", "sponsor"]);
+ok("ตารางบทบาทครบ 7 (6 ตามสคริปต์พิธีกร + director ใบ K-P5e)", () => {
+  assert.deepEqual(CARD_ROLE_ORDER, ["competitor", "judge", "organizer", "director", "vip", "speaker", "sponsor"]);
+  assert.equal(CARD_ROLES.director.en, "DIRECTOR");
+  assert.equal(new Set(CARD_ROLE_ORDER.map((k) => CARD_ROLES[k].bg)).size, 7);
   assert.equal(CARD_ROLES.judge.bg, "#F2CC2E");
   assert.equal(CARD_ROLES.judge.fg, "#1E1A08");
 });
