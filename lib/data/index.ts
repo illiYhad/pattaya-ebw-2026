@@ -1,7 +1,9 @@
+import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { mockSource } from "./mock";
+import { supabaseSource } from "./supabase";
 import type { DataSource } from "./source";
 
-// ใบ K-P1: ใช้ mock ในหน่วยความจำเท่านั้น (ห้ามต่อ Supabase) — แหล่งข้อมูล Supabase สำหรับโมเดลใหม่
-// (competitors / entries / categories) ยังไม่มี ต้องเขียนในใบถัดไปพร้อม schema · ล็อกอินยังใช้ lib/supabase/* ได้ถ้ามี env
-export const data: DataSource = mockSource;
+// K-P4: มี Supabase env ครบ → ใช้ฐานข้อมูลจริง (lib/data/supabase.ts) · ไม่มี → mock ในหน่วยความจำเหมือนเดิม (dev / เทสต์ รันได้โดยไม่มี env)
+// ตัวเลือกเดียวกับที่ lib/auth.ts ใช้ตัดสินโหมดล็อกอิน (hasSupabaseEnv) จึงไม่เกิดกรณี "ล็อกอินจริงแต่ข้อมูล mock"
+export const data: DataSource = hasSupabaseEnv ? supabaseSource : mockSource;
 export type { DataSource };

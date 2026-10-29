@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start -p 3300",
     "test:scoring": "node --experimental-transform-types --import ./scripts/register-alias.mjs scripts/test-scoring.ts",
-    "test:roles": "node --experimental-transform-types --import ./scripts/register-alias.mjs scripts/test-roles.ts"
+    "test:roles": "node --experimental-transform-types --import ./scripts/register-alias.mjs scripts/test-roles.ts",
+    "test:runofshow": "node --experimental-transform-types --import ./scripts/register-alias.mjs scripts/test-runofshow.ts",
+    "test:datasource": "node --experimental-transform-types --import ./scripts/register-alias.mjs scripts/test-datasource.ts",
+    "test:adcard": "node --experimental-transform-types --import ./scripts/register-alias.mjs scripts/test-adcard.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",
