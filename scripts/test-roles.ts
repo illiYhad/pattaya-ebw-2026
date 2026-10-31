@@ -24,6 +24,7 @@ same("/admin/scoreboard", ["admin"]);
 
 // หน้าที่สตาฟกรอกผลเข้าได้อยู่แล้ว
 same("/admin/photos", ["admin", "result_staff"]);
+same("/admin/photos/bulk", ["admin"]); // K-EBW-PHOTO-UP: อัปโหลดหลายไฟล์ แอดมินเท่านั้น
 same("/checkin", ["admin", "result_staff"]);
 same("/print/scoresheet/lip", ["admin", "result_staff"]);
 

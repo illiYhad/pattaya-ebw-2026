@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { data } from "@/lib/data";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { PhotoStudioClient } from "@/components/admin/PhotoStudioClient";
@@ -27,6 +28,9 @@ export default async function PhotosPage() {
     <div className="space-y-4">
       <AdminNav />
       <h1 className="text-xl font-bold">ถ่ายรูปผู้แข่ง (กรีนสกรีน)</h1>
+      <p className="text-sm">
+        <Link href="/admin/photos/bulk" className="underline">อัปโหลดรูปจากไฟล์หลายรูป</Link>
+      </p>
       <PhotoStudioClient persons={persons} photos={photos} />
     </div>
   );

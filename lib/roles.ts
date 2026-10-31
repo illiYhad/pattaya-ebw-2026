@@ -4,6 +4,7 @@ import type { StaffRole } from "@/lib/types";
 
 /** สิทธิ์ตามเส้นทาง (ใช้ทั้ง proxy.ts และหน้าเว็บ) · find ใช้แถวแรกที่ตรง → แถวเจาะจงต้องอยู่ก่อน `/admin` */
 export const PATH_ROLES: { prefix: string; roles: StaffRole[] }[] = [
+  { prefix: "/admin/photos/bulk", roles: ["admin"] }, // K-EBW-PHOTO-UP: อัปโหลดรูปหลายไฟล์ — แอดมินเท่านั้น (ต้องอยู่ก่อน /admin/photos)
   { prefix: "/admin/photos", roles: ["admin", "result_staff"] },
   { prefix: "/admin/score", roles: ["admin", "result_staff"] },
   { prefix: "/admin/run-of-show", roles: ["admin", "result_staff", "stream_operator"] }, // K-P3a: คิวงาน+สคริปต์ MC อ่านอย่างเดียว · อยู่ใต้ /admin เพื่อให้ matcher ของ proxy.ts คุมอยู่แล้ว
